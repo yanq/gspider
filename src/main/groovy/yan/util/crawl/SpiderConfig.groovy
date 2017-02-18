@@ -12,8 +12,7 @@ class SpiderConfig {
     SpiderConfig(Spider s){
         this.spider =s
     }
-
-    def seed(String ...urls){
+    def seeds(String ...urls){
         spider.getRoundLinkSet(1).addAll(urls)
     }
     def includeOutSite(boolean b){
