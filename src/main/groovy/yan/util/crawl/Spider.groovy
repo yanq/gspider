@@ -20,6 +20,8 @@ class Spider{
     List<Pattern> excludeRegexList = new ArrayList<>()
     Map<Pattern,Closure> handlers = new HashMap<>()
     Map<Integer,HashSet<String>> roundLinks = new HashMap<Integer,HashSet<String>>()
+    Map<String,Object> defaultParameters = [connectTimeout:5000,readTimeout:5000]
+    String defaultChaset = "UTF-8"
     Closure downloader,reviewPage
     ExecutorService service
 
@@ -62,7 +64,7 @@ class Spider{
     void process(Page page){
         log.debug("Process url ${page.url}")
         page.startAt = new Date()
-        page.text = downloader ? downloader.call(page.url) : new URL(page.url).getText([connectTimeout:5000,readTimeout:5000])
+        page.text = downloader ? downloader.call(page.url) : new URL(page.url).getText(defaultParameters,defaultChaset)
         page.downloadedAt = new Date()
 
         handlers.each {

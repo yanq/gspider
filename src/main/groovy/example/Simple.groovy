@@ -14,6 +14,8 @@ Spider.crawl {
     maxFetch 20
     thread 1
     include ".*/audios/.*"
+    defaultParameters 'connectTimeout':5000,'readTimeout':5000,requestProperties:['user-agent':'a groovy spider']
+    defaultCharset 'utf-8'
 
     handle{ Page page ->
         println("Handle -> "+page.url)

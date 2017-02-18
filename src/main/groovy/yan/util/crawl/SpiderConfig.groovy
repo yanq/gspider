@@ -49,4 +49,10 @@ class SpiderConfig {
     def review(Closure closure){
         spider.reviewPage = closure
     }
+    def defaultCharset(String charset){
+        spider.defaultChaset = charset
+    }
+    def defaultParameters(Map map){
+        spider.defaultParameters << map
+    }
 }
