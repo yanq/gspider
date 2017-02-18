@@ -17,7 +17,7 @@ class Page {
     private GPathResult _html
     private Object _json
     List<String> links = new ArrayList<>()
-
+    Map<String,Object> data = new HashMap<>()
     Date createAt = new Date()
     Date startAt,downloadedAt,endAt
 
