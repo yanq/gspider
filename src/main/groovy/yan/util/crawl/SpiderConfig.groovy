@@ -140,4 +140,8 @@ class SpiderConfig {
     def defaultParameters(Map map){
         spider.defaultParameters << map
     }
+
+    def acceptCookies(boolean accept){
+        spider.acceptCookies = accept
+    }
 }

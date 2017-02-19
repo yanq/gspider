@@ -22,10 +22,12 @@ class Spider{
     Map<Integer,HashSet<String>> roundLinks = new HashMap<Integer,HashSet<String>>()
     Map<String,Object> defaultParameters = [connectTimeout:5000,readTimeout:5000]
     String defaultChaset = "UTF-8"
+    boolean acceptCookies = false
     Closure downloader,reviewPage
     ExecutorService service
 
     void completeInit(){
+        if (acceptCookies) setCookieHandler();
         if (!service) service = Executors.newFixedThreadPool(maxThreadCount)
         log.info("Config : round $maxRoundCount ,maxFetch $maxFetchCount ,thread $maxThreadCount ,seeds ${getRoundLinkSet(1)} .")
     }
@@ -119,6 +121,12 @@ class Spider{
 
     private String reorganize(Page page,String url){
         url.contains('://') ? url : "${page.host}/${!url.startsWith('/') ? url : url.substring(1)}"
+    }
+
+    private void setCookieHandler(){
+        CookieManager cookieManager = new CookieManager()
+        cookieManager.setCookiePolicy(CookiePolicy.ACCEPT_ALL)
+        cookieManager.setDefault(cookieManager)
     }
 
     static crawl(@DelegatesTo(SpiderConfig) Closure closure){
