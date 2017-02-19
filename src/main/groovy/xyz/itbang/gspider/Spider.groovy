@@ -1,4 +1,4 @@
-package yan.util.crawl
+package xyz.itbang.gspider
 
 import groovy.util.logging.Slf4j
 import java.util.concurrent.Callable

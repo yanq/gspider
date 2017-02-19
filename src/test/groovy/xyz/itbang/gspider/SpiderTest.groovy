@@ -1,4 +1,4 @@
-package yan.util.crawl
+package xyz.itbang.gspider
 
 /**
  * Created by yan on 2017/2/16.

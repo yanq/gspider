@@ -1,4 +1,4 @@
-package yan.util.crawl
+package xyz.itbang.gspider
 
 import java.util.regex.Pattern
 

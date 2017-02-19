@@ -1,4 +1,4 @@
-package yan.util.crawl
+package xyz.itbang.gspider
 
 import groovy.json.JsonSlurper
 import groovy.util.logging.Slf4j
