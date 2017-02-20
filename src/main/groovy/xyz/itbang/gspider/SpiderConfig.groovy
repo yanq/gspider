@@ -141,7 +141,21 @@ class SpiderConfig {
         spider.defaultParameters << map
     }
 
+    /**
+     * 是否接受 cookie
+     * @param accept  默认 false，不处理 cookie；true 接受一切 cookie
+     * @return
+     */
     def acceptCookies(boolean accept){
         spider.acceptCookies = accept
+    }
+
+    /**
+     * 失败重试次数
+     * @param c 默认为 1
+     * @return
+     */
+    def failRetryCount(int c){
+        spider.failRetryCount = c
     }
 }

@@ -13,6 +13,7 @@ class Page {
     int round = 1
     String url = ''
     String text = ''
+    boolean fail = false
     private URI _uri
     private GPathResult _html
     private Object _json
@@ -20,6 +21,10 @@ class Page {
     Map<String,Object> data = new HashMap<>()
     Date createAt = new Date()
     Date startAt,downloadedAt,endAt
+
+    void markAsFailed(){
+        fail = true
+    }
 
     String getHost(){
         "${uri.scheme}://${uri.host}${uri.port>0 ? ':'+uri.port : ''}"

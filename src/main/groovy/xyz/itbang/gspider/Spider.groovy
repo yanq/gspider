@@ -16,6 +16,7 @@ class Spider{
     int maxFetchCount = 100
     int maxThreadCount  = 3
     boolean includeOutSite = false
+    int failRetryCount = 1
     List<Pattern> includeRegexList = new ArrayList<>()
     List<Pattern> excludeRegexList = new ArrayList<>()
     Map<Pattern,Closure> handlers = new HashMap<>()
@@ -49,7 +50,23 @@ class Spider{
                         try {
                             process(page)
                         }catch (Exception e){
+                            page.markAsFailed()
                             e.printStackTrace()
+                        }finally{
+                            if (page.fail){
+                                for (int i = 0; i < failRetryCount; i++) {
+                                    try {
+                                        page = new Page(url: link, round: round)
+                                        process(page)
+                                        if (!page.fail) break
+                                    }catch (Exception e){
+                                        page.markAsFailed()
+                                        e.printStackTrace()
+                                    }finally{
+                                        if (page.fail) log.warn("Retry ${i+1} failed for url : ${page.url}")
+                                    }
+                                }
+                            }
                         }
 
                         reviewPage.call(page)
