@@ -35,6 +35,7 @@ class Spider{
 
     void start(){
         log.info("Spider starting ...")
+        Date start = new Date()
 
         completeInit()
 
@@ -77,7 +78,7 @@ class Spider{
         }
         service.shutdown()
 
-        log.info("Crawl over,fetch totle ${roundLinks.values()*.size().sum()} .")
+        log.info("Crawl over,fetch totle ${roundLinks.values()*.size().sum()} , total time ${(new Date().time - start.time)/1000} s .")
     }
     //process
     void process(Page page){
@@ -95,7 +96,7 @@ class Spider{
         parserLinks(page)
 
         page.endAt = new Date()
-        log.debug("Process url ${page.url} over, use time ${(page.endAt.time - page.startAt.time)} ms")
+        log.debug("Process url ${page.url} over, use time ${(page.endAt.time - page.startAt.time)/1000} s")
     }
 
     void parserLinks(Page page) {

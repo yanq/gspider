@@ -36,7 +36,7 @@ class Page {
 
     GPathResult getHtml(){
         if (!_html) {
-            log.debug("Transform text to html for page ${url}")
+            log.trace("Transform text to html for page ${url}")
 
             def parser = new org.ccil.cowan.tagsoup.Parser()
             parser.setFeature("http://xml.org/sax/features/namespaces", false)
@@ -53,7 +53,7 @@ class Page {
 
     Object getJson() {
         if (!_json){
-            log.debug("Transform text to json for page ${url}")
+            log.trace("Transform text to json for page ${url}")
 
             JsonSlurper jsonSlurper = new JsonSlurper()
             try {
