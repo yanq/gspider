@@ -1,14 +1,15 @@
 group 'xyz.itbang'
-version '1.0'
+version '1.1'
 
 apply plugin: 'groovy'
 apply plugin: 'java'
 apply plugin: 'maven'
+apply plugin: 'signing' //使用signing plugin做数字签名
 
 sourceCompatibility = 1.8
 
 repositories {
-//    maven{ url 'http://maven.aliyun.com/nexus/content/groups/public/'}
+    maven{ url 'http://maven.aliyun.com/nexus/content/groups/public/'}
     mavenCentral()
 }
 
@@ -22,35 +23,62 @@ dependencies {
     testCompile group: 'junit', name: 'junit', version: '4.11'
 }
 
-//打包源代码
-task sourcesJar(type: Jar, dependsOn: classes) {
+uploadArchives {
+    repositories {
+        mavenDeployer {
+            beforeDeployment { MavenDeployment deployment -> signing.signPom(deployment) }
+
+            repository(url: "https://oss.sonatype.org/service/local/staging/deploy/maven2/") {
+                authentication(userName: userName, password: password)
+            }
+
+            pom.project {
+                name "gspider"
+                packaging 'jar'
+                description 'a groovy spider.'
+                url 'https://github.com/yanq/gspider'
+
+                scm {
+                    url 'https://github.com/yanq/gspider.git'
+                    connection 'https://github.com/yanq/gspider.git'
+                    developerConnection 'https://github.com/yanq/gspider.git'
+                }
+
+                licenses {
+                    license {
+                        name 'The Apache Software License, Version 2.0'
+                        url 'http://www.apache.org/licenses/LICENSE-2.0.txt'
+                        distribution 'repo'
+                    }
+                }
+
+                developers {
+                    developer {
+                        id 'JackYan'
+                        name 'Jack Yan'
+                    }
+                }
+            }
+        }
+    }
+}
+
+task javadocJar(type: Jar, dependsOn: javadoc) {
+    classifier = 'javadoc'
+    from 'build/docs/javadoc'
+}
+
+task sourcesJar(type: Jar) {
     classifier = 'sources'
     from sourceSets.main.allSource
 }
 
 artifacts {
+    archives jar
+    archives javadocJar
     archives sourcesJar
 }
 
-//如果希望gradle install，安装到.m2本地仓库，参考下面的内容
-install {
-    repositories.mavenInstaller {
-        pom.version = "$project.version"
-        pom.artifactId = "gspider"
-        pom.groupId = "$project.group"
-    }
-}
-
-//上传到nexus
-uploadArchives {
-    repositories {
-        mavenDeployer {
-            repository(url: "https://oss.sonatype.org/service/local/staging/deploy/maven2/") {
-                authentication(userName: "xx", password: "xx")
-            }
-            pom.version = "$project.version"
-            pom.artifactId = "gspider"
-            pom.groupId = "$project.group"
-        }
-    }
+signing {
+    sign configurations.archives
 }
