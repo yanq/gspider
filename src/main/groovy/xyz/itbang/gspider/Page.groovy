@@ -20,7 +20,7 @@ class Page {
     List<String> links = new ArrayList<>()
     Map<String,Object> data = new HashMap<>()
     Date createAt = new Date()
-    Date startAt,downloadedAt,endAt
+    Date startAt, downloadEndAt, endAt
 
     void markAsFailed(){
         fail = true

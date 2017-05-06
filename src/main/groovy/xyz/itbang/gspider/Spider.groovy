@@ -1,6 +1,8 @@
 package xyz.itbang.gspider
 
 import groovy.util.logging.Slf4j
+import xyz.itbang.gspider.download.DefaultDownloader
+import xyz.itbang.gspider.download.Downloader
 import java.util.concurrent.Callable
 import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
@@ -17,18 +19,16 @@ class Spider{
     int maxThreadCount  = 3
     boolean includeOutSite = false
     int failRetryCount = 1
+    Map<Integer, HashSet<String>> roundLinks = new HashMap<Integer, HashSet<String>>()
+    ExecutorService service
     List<Pattern> includeRegexList = new ArrayList<>()
     List<Pattern> excludeRegexList = new ArrayList<>()
+    Downloader downloader
     Map<Pattern,Closure> handlers = new HashMap<>()
-    Map<Integer,HashSet<String>> roundLinks = new HashMap<Integer,HashSet<String>>()
-    Map<String,Object> defaultParameters = [connectTimeout:5000,readTimeout:5000]
-    String defaultChaset = "UTF-8"
-    boolean acceptCookies = false
-    Closure downloader,reviewPage
-    ExecutorService service
+    Closure reviewPage
 
     void completeInit(){
-        if (acceptCookies) setCookieHandler();
+        if (!downloader) downloader = new DefaultDownloader()
         if (!service) service = Executors.newFixedThreadPool(maxThreadCount)
         log.info("Config : round $maxRoundCount ,maxFetch $maxFetchCount ,thread $maxThreadCount ,seeds ${getRoundLinkSet(1)} .")
     }
@@ -83,9 +83,10 @@ class Spider{
     //process
     void process(Page page){
         log.debug("Process url ${page.url}")
+
         page.startAt = new Date()
-        page.text = downloader ? downloader.call(page.url) : new URL(page.url).getText(defaultParameters,defaultChaset)
-        page.downloadedAt = new Date()
+        page.text = downloader.download(page.url)
+        page.downloadEndAt = new Date()
 
         handlers.each {
             if (it.key.matcher(page.url).matches()){
@@ -104,14 +105,14 @@ class Spider{
         if (roundLinks.values()*.size().sum() >= maxFetchCount) return
 
         log.debug("Parse links from ${page.url}")
-        if (page.links){
+        if (page.links) {
             page.links.each {
-                it = reorganize(page,it)
+                it = reorganize(page, it)
             }
-        }else {
-            page.html.body.'**'.findAll{it.name()=='a'}.each {
+        } else {
+            page.html.body.'**'.findAll { it.name() == 'a' }.each {
                 //这里根据规则过滤
-                def link = reorganize(page,(it.@href).toString())
+                def link = reorganize(page, (it.@href).toString())
                 if (!includeOutSite && !link.startsWith(page.host)) return
                 if (excludeRegexList && excludeRegexList.find { it.matcher(link).matches() }) return
                 if (includeRegexList && !includeRegexList.find { it.matcher(link).matches() }) return
@@ -123,31 +124,26 @@ class Spider{
 
         page.links.each {
             String url = it.trim()
-            if (["javascript:","mailto:","#"].find { url.contains(it) }) return
-            if (!roundLinks.values().find{ it.contains(url)} && roundLinks.values()*.size().sum() < maxFetchCount){
-                getRoundLinkSet(page.round+1).add(it)
-            }else {
+            if (["javascript:", "mailto:", "#"].find { url.contains(it) }) return
+            if (!roundLinks.values().find { it.contains(url) } && roundLinks.values()*.size().sum() < maxFetchCount) {
+                getRoundLinkSet(page.round + 1).add(it)
+            } else {
                 log.debug("Because too mach or duplicate ,drop the link $it")
             }
         }
     }
 
-    private Set<String> getRoundLinkSet(int i){
-        if (!roundLinks[i]) roundLinks.put(i,Collections.synchronizedSet(new HashSet()))
+    private Set<String> getRoundLinkSet(int i) {
+        if (!roundLinks[i]) roundLinks.put(i, Collections.synchronizedSet(new HashSet()))
         return roundLinks[i]
     }
 
-    private String reorganize(Page page,String url){
+    private String reorganize(Page page, String url) {
         url.contains('://') ? url : "${page.host}/${!url.startsWith('/') ? url : url.substring(1)}"
     }
 
-    private void setCookieHandler(){
-        CookieManager cookieManager = new CookieManager()
-        cookieManager.setCookiePolicy(CookiePolicy.ACCEPT_ALL)
-        cookieManager.setDefault(cookieManager)
-    }
 
-    static crawl(@DelegatesTo(SpiderConfig) Closure closure){
+    static crawl(@DelegatesTo(SpiderConfig) Closure closure) {
         Spider spider = new Spider()
 
         SpiderConfig config = new SpiderConfig(spider)

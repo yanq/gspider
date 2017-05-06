@@ -1,5 +1,6 @@
 package xyz.itbang.gspider
 
+import xyz.itbang.gspider.download.Downloader
 import java.util.regex.Pattern
 
 /**
@@ -106,8 +107,8 @@ class SpiderConfig {
      * @param closure
      * @return
      */
-    def download(Closure closure){
-        spider.downloader = closure
+    def downloader(Downloader downloader){
+        spider.downloader = downloader
     }
 
     /**
@@ -119,35 +120,6 @@ class SpiderConfig {
      */
     def review(Closure closure){
         spider.reviewPage = closure
-    }
-
-    /**
-     * 默认的解码字符集
-     * 注意，这里只影响默认的 downloader ，自定义的 downloader 需自行处理
-     * @param charset
-     * @return
-     */
-    def defaultCharset(String charset){
-        spider.defaultChaset = charset
-    }
-
-    /**
-     * 参见 groovy jdk URL.getText(parameters) 文档
-     * 注意，这里只影响默认的 downloader ，自定义的 downloader 需自行处理
-     * @param map
-     * @return
-     */
-    def defaultParameters(Map map){
-        spider.defaultParameters << map
-    }
-
-    /**
-     * 是否接受 cookie
-     * @param accept  默认 false，不处理 cookie；true 接受一切 cookie
-     * @return
-     */
-    def acceptCookies(boolean accept){
-        spider.acceptCookies = accept
     }
 
     /**
