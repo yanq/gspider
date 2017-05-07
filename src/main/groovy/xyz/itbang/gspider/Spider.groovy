@@ -1,8 +1,6 @@
 package xyz.itbang.gspider
 
 import groovy.util.logging.Slf4j
-import xyz.itbang.gspider.download.DefaultDownloader
-import xyz.itbang.gspider.download.Downloader
 import java.util.concurrent.Callable
 import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
@@ -87,9 +85,9 @@ class Spider{
                 it = reorganize(page, it)
             }
         } else {
-            page.html.body.'**'.findAll { it.name() == 'a' }.each {
+            page.document.select("a[href]")*.attr('href').each {
                 //这里根据规则过滤
-                def link = reorganize(page, (it.@href).toString())
+                def link = reorganize(page, it.toString())
                 if (!includeOutSite && !link.startsWith(page.host)) return
                 if (excludeRegexList && excludeRegexList.find { it.matcher(link).matches() }) return
                 if (includeRegexList && !includeRegexList.find { it.matcher(link).matches() }) return

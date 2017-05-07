@@ -2,9 +2,9 @@ package xyz.itbang.gspider
 
 import groovy.json.JsonSlurper
 import groovy.util.logging.Slf4j
-import groovy.util.slurpersupport.GPathResult
-import xyz.itbang.gspider.download.DefaultDownloader
-import xyz.itbang.gspider.download.Downloader
+import org.jsoup.Connection
+import org.jsoup.Jsoup
+import org.jsoup.nodes.Document
 
 /**
  * Page 涵盖了一个链接在抓取和处理过程中的所有数据，用于多个过程中的共享，并提供了格式的转换。
@@ -20,12 +20,13 @@ class Page {
     Date startAt, downloadEndAt, endAt
     //download
     int currentRound = 1
-    Downloader downloader
     int failRetryCount = 1
     // for cache read only properties
+    private Connection _connection
     private URI _uri
-    private GPathResult _html
+    private Document _document
     private Object _json
+
 
     String getText(){
         if (text) return text
@@ -37,25 +38,16 @@ class Page {
         "${uri.scheme}://${uri.host}${uri.port>0 ? ':'+uri.port : ''}"
     }
 
+    Connection getConnection(){
+        _connection ?: (_connection = Jsoup.connect(url))
+    }
+
     URI getUri() {
         _uri ?: (_uri = new URI(url))
     }
 
-    GPathResult getHtml(){
-        if (!_html) {
-            log.trace("Transform text to html for page ${url}")
-
-            def parser = new org.ccil.cowan.tagsoup.Parser()
-            parser.setFeature("http://xml.org/sax/features/namespaces", false)
-            def slurper = new XmlSlurper(parser)
-            try {
-                _html = slurper.parseText(getText())
-            }catch (Exception e){
-                _html = slurper.parseText("")
-                e.printStackTrace()
-            }
-        }
-        return _html
+    Document getDocument(){
+        _document ?: (_document = Jsoup.parse(getText()))
     }
 
     Object getJson() {
@@ -81,16 +73,14 @@ class Page {
     void clearStatus() {
         fail = false
         _uri = null
-        _html = null
+        _document = null
         _json = null
     }
 
     void download(){
-        downloader = downloader ?: new DefaultDownloader()
-
         startAt = new Date()
         try {
-            text = downloader.download(url)
+            text = connection.execute().body()
         }catch (Exception e){
             e.printStackTrace()
             //重试，并设置状态
@@ -98,7 +88,7 @@ class Page {
                 log.warn("Download fail,retry ${i+1}")
                 clearStatus()
                 try {
-                    text = downloader.download(url)
+                    text = connection.execute().body()
                     break
                 }catch (Exception ea){
                     ea.printStackTrace()

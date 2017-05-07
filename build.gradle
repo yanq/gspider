@@ -15,7 +15,7 @@ repositories {
 
 dependencies {
     compile 'org.codehaus.groovy:groovy-all:2.4.7'
-    compile group: 'org.ccil.cowan.tagsoup', name: 'tagsoup', version: '1.2.1'
+    compile 'org.jsoup:jsoup:1.10.2'
     compile group: 'org.slf4j', name: 'slf4j-api', version: '1.7.22'
 
     runtime group: 'ch.qos.logback', name: 'logback-classic', version: '1.2.1'
@@ -24,7 +24,6 @@ dependencies {
 
     //for test
     //testCompile "org.bitbucket.cowwoc:diff-match-patch:1.1"
-    testCompile 'org.jsoup:jsoup:1.10.2'
 }
 
 uploadArchives {

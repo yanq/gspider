@@ -1,6 +1,6 @@
 package xyz.itbang.gspider
 
-import xyz.itbang.gspider.download.Downloader
+
 import java.util.regex.Pattern
 
 /**
@@ -103,15 +103,6 @@ class SpiderConfig {
     }
 
     /**
-     * 自定义下载器，接收一个 url string，经过自定义处理，下载页面内容，并返回内容为一个 string 。
-     * @param closure
-     * @return
-     */
-    def downloader(Downloader downloader){
-        spider.downloader = downloader
-    }
-
-    /**
      * 回顾 Page
      * 闭包接收一个 Page 参数，这是处理结束后，最后一次对 page 处理。
      * 即便线程内因为异常无法正常处理完成，这里也会处理到。
@@ -120,14 +111,5 @@ class SpiderConfig {
      */
     def review(Closure closure){
         spider.reviewPage = closure
-    }
-
-    /**
-     * 失败重试次数
-     * @param c 默认为 1
-     * @return
-     */
-    def failRetryCount(int c){
-        spider.failRetryCount = c
     }
 }
