@@ -14,4 +14,20 @@ class Tools {
         cookieManager.setCookiePolicy(CookiePolicy.ACCEPT_ALL)
         cookieManager.setDefault(cookieManager)
     }
+
+    static void waitFor(String message){
+        println("Waiting for $message")
+        Scanner scanner = new Scanner(System.in)
+        String result = ''
+        while (true){
+            println("When thing done,just type yes :")
+            result = scanner.next()
+            if ("yes" == result) return
+            continue
+        }
+    }
+
+    public static void main(String[] args) {
+        waitFor("deng")
+    }
 }

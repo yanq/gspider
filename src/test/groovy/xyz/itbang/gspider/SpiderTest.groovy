@@ -16,6 +16,7 @@ class SpiderTest extends GroovyTestCase {
             seeds "http://www.luofans.com/"
             handle { Page page ->
                 println("Handle -> " + page.url)
+                //Tools.waitFor("登录") //noway
                 println("Title -> " + page.document.title())
             }
         }
@@ -39,15 +40,19 @@ class SpiderTest extends GroovyTestCase {
     }
 
     void testJsoup() {
-        //Tools.setAcceptAllCookies() //ok
+        Tools.setAcceptAllCookies() //ok
 
-//        Page page = new Page(url: localHi)
-//        println page.connection.userAgent("GSpider").get()
-//        println page.document
-//        println page.json
+        Page page = new Page(url: localHi)
+        println page.connection.userAgent("GSpider").get()
+        println page.document
+        println page.json
 
-        Page page = new Page(url: luofans)
-        println page.document.select('a')*.attr('href')
+        Page pageLuofans = new Page(url: luofans)
+        println pageLuofans.document.select('a')*.attr('href')
+    }
+
+    void testWaitFor(){
+        //Tools.waitFor("Login,登录") //貌似测试运行时，无法从控制台读取数据，直接运行就可以。
     }
 
 }
