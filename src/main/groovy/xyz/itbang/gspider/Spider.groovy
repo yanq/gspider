@@ -79,7 +79,7 @@ class Spider{
 
     void parserLinks(Page page) {
         if (page.currentRound >= maxRoundCount) return
-        if (roundLinks.values()*.size().sum() >= maxFetchCount) return
+        if (roundLinksTotal() >= maxFetchCount) return
 
         log.debug("Parse links from ${page.url}")
         if (page.links) {
@@ -102,7 +102,7 @@ class Spider{
         page.links.each {
             String url = it.trim()
             if (["javascript:", "mailto:", "#"].find { url.contains(it) }) return
-            if (!roundLinks.values().find { it.contains(url) } && roundLinks.values()*.size().sum() < maxFetchCount) {
+            if (!roundLinks.values().find { it.contains(url) } && roundLinksTotal() < maxFetchCount) {
                 getRoundLinkSet(page.currentRound + 1).add(it)
             } else {
                 log.debug("Because too mach or duplicate ,drop the link $it")
@@ -113,6 +113,10 @@ class Spider{
     private Set<String> getRoundLinkSet(int i) {
         if (!roundLinks[i]) roundLinks.put(i, Collections.synchronizedSet(new HashSet()))
         return roundLinks[i]
+    }
+
+    private int roundLinksTotal(){
+        return roundLinks.values()*.size().sum()
     }
 
     private String reorganize(Page page, String url) {
