@@ -3,6 +3,8 @@ package xyz.itbang.gspider
 import groovy.json.JsonSlurper
 import groovy.util.logging.Slf4j
 import groovy.util.slurpersupport.GPathResult
+import xyz.itbang.gspider.download.DefaultDownloader
+import xyz.itbang.gspider.download.Downloader
 
 /**
  * Page 涵盖了一个链接在抓取和处理过程中的所有数据，用于多个过程中的共享，并提供了格式的转换。
@@ -10,20 +12,25 @@ import groovy.util.slurpersupport.GPathResult
  */
 @Slf4j
 class Page {
-    int round = 1
     String url = ''
     String text = ''
     boolean fail = false
+    List<String> links = new ArrayList<>()
+    Map<String, Object> data = new HashMap<>()
+    Date startAt, downloadEndAt, endAt
+    //download
+    int currentRound = 1
+    Downloader downloader
+    int failRetryCount = 1
+    // for cache read only properties
     private URI _uri
     private GPathResult _html
     private Object _json
-    List<String> links = new ArrayList<>()
-    Map<String,Object> data = new HashMap<>()
-    Date createAt = new Date()
-    Date startAt, downloadEndAt, endAt
 
-    void markAsFailed(){
-        fail = true
+    String getText(){
+        if (text) return text
+        download()
+        return text
     }
 
     String getHost(){
@@ -42,7 +49,7 @@ class Page {
             parser.setFeature("http://xml.org/sax/features/namespaces", false)
             def slurper = new XmlSlurper(parser)
             try {
-                _html = slurper.parseText(text)
+                _html = slurper.parseText(getText())
             }catch (Exception e){
                 _html = slurper.parseText("")
                 e.printStackTrace()
@@ -57,7 +64,7 @@ class Page {
 
             JsonSlurper jsonSlurper = new JsonSlurper()
             try {
-                _json = jsonSlurper.parseText(text)
+                _json = jsonSlurper.parseText(getText())
             }catch (Exception e){
                 _json = jsonSlurper.parseText('{}')
                 e.printStackTrace()
@@ -66,7 +73,44 @@ class Page {
         return _json
     }
 
-    String toString(){
-        "${round} : $url"
+
+    void markAsFailed() {
+        fail = true
+    }
+
+    void clearStatus() {
+        fail = false
+        _uri = null
+        _html = null
+        _json = null
+    }
+
+    void download(){
+        downloader = downloader ?: new DefaultDownloader()
+
+        startAt = new Date()
+        try {
+            text = downloader.download(url)
+        }catch (Exception e){
+            e.printStackTrace()
+            //重试，并设置状态
+            for (int i = 0; i < failRetryCount; i++) {
+                log.warn("Download fail,retry ${i+1}")
+                clearStatus()
+                try {
+                    text = downloader.download(url)
+                    break
+                }catch (Exception ea){
+                    ea.printStackTrace()
+                    markAsFailed()
+                    continue
+                }
+            }
+        }
+        downloadEndAt = new Date()
+    }
+
+    String toString() {
+        "${currentRound} : $url"
     }
 }

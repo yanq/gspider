@@ -18,17 +18,14 @@ class Spider{
     int maxFetchCount = 100
     int maxThreadCount  = 3
     boolean includeOutSite = false
-    int failRetryCount = 1
     Map<Integer, HashSet<String>> roundLinks = new HashMap<Integer, HashSet<String>>()
     ExecutorService service
     List<Pattern> includeRegexList = new ArrayList<>()
     List<Pattern> excludeRegexList = new ArrayList<>()
-    Downloader downloader
     Map<Pattern,Closure> handlers = new HashMap<>()
     Closure reviewPage
 
     void completeInit(){
-        if (!downloader) downloader = new DefaultDownloader()
         if (!service) service = Executors.newFixedThreadPool(maxThreadCount)
         log.info("Config : round $maxRoundCount ,maxFetch $maxFetchCount ,thread $maxThreadCount ,seeds ${getRoundLinkSet(1)} .")
     }
@@ -43,33 +40,17 @@ class Spider{
             def round = it+1,links = getRoundLinkSet(round).value
             log.info("Start round ${round} ,total ${links.size()} ...")
             def tasks = links.collect{
-                def link = it.toString() //不知道为什么，如果没有 toString ，得到的是 char object。
+                def link = it.toString()
                 new Callable<Object>() {
                     @Override
                     Object call() {
-                        Page page = new Page(url: link, round: round)
+                        Page page = new Page(url: link, currentRound: round)
                         try {
                             process(page)
                         }catch (Exception e){
                             page.markAsFailed()
                             e.printStackTrace()
-                        }finally{
-                            if (page.fail){
-                                for (int i = 0; i < failRetryCount; i++) {
-                                    try {
-                                        page = new Page(url: link, round: round)
-                                        process(page)
-                                        if (!page.fail) break
-                                    }catch (Exception e){
-                                        page.markAsFailed()
-                                        e.printStackTrace()
-                                    }finally{
-                                        if (page.fail) log.warn("Retry ${i+1} failed for url : ${page.url}")
-                                    }
-                                }
-                            }
                         }
-
                         reviewPage.call(page)
                     }
                 }
@@ -84,10 +65,6 @@ class Spider{
     void process(Page page){
         log.debug("Process url ${page.url}")
 
-        page.startAt = new Date()
-        page.text = downloader.download(page.url)
-        page.downloadEndAt = new Date()
-
         handlers.each {
             if (it.key.matcher(page.url).matches()){
                 it.value.call(page)
@@ -101,7 +78,7 @@ class Spider{
     }
 
     void parserLinks(Page page) {
-        if (page.round >= maxRoundCount) return
+        if (page.currentRound >= maxRoundCount) return
         if (roundLinks.values()*.size().sum() >= maxFetchCount) return
 
         log.debug("Parse links from ${page.url}")
@@ -126,7 +103,7 @@ class Spider{
             String url = it.trim()
             if (["javascript:", "mailto:", "#"].find { url.contains(it) }) return
             if (!roundLinks.values().find { it.contains(url) } && roundLinks.values()*.size().sum() < maxFetchCount) {
-                getRoundLinkSet(page.round + 1).add(it)
+                getRoundLinkSet(page.currentRound + 1).add(it)
             } else {
                 log.debug("Because too mach or duplicate ,drop the link $it")
             }
