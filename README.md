@@ -6,25 +6,19 @@ a Groovy Spider,make crawl easy.
 
 ## Feature 特性
 - easy to use,support crawl dsl. 简单易用，支持抓取DSL。
-- easy to custom your downloader,for complex situation. 灵活自定义下载器和处理器,以应对这个复杂多变的网络世界。
-- easy to process result,by transform to Groovy GPath or json or just text. 响应结果转换为 Gpath，json 操作，及其便捷，也可以直接操作原文。
+- easy to manipulating html,by transform to jsoup document or json or just text. 响应结果可转换为 jsoup document，json 等，方便处理，也可以直接处理原文。
 - out of box of multithread,text clean,url filter and so on. 开箱即用的多线程，文本分析清洗，过滤URL等等。
 
 ## Example 示例
 [code file](https://github.com/yanq/gspider/blob/master/src/main/groovy/example/Simple.groovy)
 ```
-Spider.crawl {
-    seeds "http://www.luofans.com/"
-    rounds 3
-    maxFetch 20
-    thread 1
-    include ".*/audios/.*"
-
-    handle{ Page page ->
-        println("Handle -> "+page.url)
-        println("Title -> "+page.html.head.title)
-    }
-}
+        Spider.crawl {
+            seeds "http://www.luofans.com/"
+            handle { Page page ->
+                println("Handle -> " + page.url)
+                println("Title -> " + page.document.title())
+            }
+        }
 ```
 > **Warning 注意**
 > 
@@ -33,9 +27,9 @@ Spider.crawl {
 > 别抓太多哈，这个网站可是我亲儿子，别整坏了。
 
 ## How to use  咋用
-1. more info about dsl，see [link](https://github.com/yanq/gspider/blob/master/src/main/groovy/yan/util/crawl/SpiderConfig.groovy)。 更多可用方法，参考 [link](https://github.com/yanq/gspider/blob/master/src/main/groovy/yan/util/crawl/SpiderConfig.groovy)。
-2. todo publsih to maven。回头我会放到 maven 库。 
-3. So，now，just download the project and code。 现在请直接下载本项目，然后写自己的代码就好。
+```
+compile 'xyz.itbang:gspider:1.2'
+```
 
 ## Something to say 吹点牛
 If you can not read chinese，nothing important，just to have a cup of tea。someday，i'll say it again in English。
