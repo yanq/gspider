@@ -26,7 +26,11 @@ class Page {
     private URI _uri
     private Document _document
     private Object _json
+    private _id
 
+    String getId(){
+        _id ?: UUID.randomUUID().toString()
+    }
 
     String getText(){
         if (text) return text
