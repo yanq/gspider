@@ -23,6 +23,10 @@ class SpiderConfig {
         spider.getRoundLinkSet(1).addAll(urls)
     }
 
+    def seeds(List urls){
+        spider.getRoundLinkSet(1).addAll(urls)
+    }
+
     /**
      * 是否包含外部站点，默认不包含。
      * @param b
