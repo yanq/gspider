@@ -29,7 +29,7 @@ class Page {
     private _id
 
     String getId(){
-        _id ?: UUID.randomUUID().toString()
+        _id ?: (_id = UUID.randomUUID().toString())
     }
 
     String getText(){
