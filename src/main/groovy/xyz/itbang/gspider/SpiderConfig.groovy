@@ -15,6 +15,15 @@ class SpiderConfig {
     }
 
     /**
+     * 定义抓取的名称前缀，每次抓取会生成一个名称@时间的抓取名称。
+     * @param name
+     * @return
+     */
+    def name(String name){
+        spider.crawlName = name
+    }
+
+    /**
      * 定义种子页面
      * @param urls
      * @return
@@ -115,5 +124,14 @@ class SpiderConfig {
      */
     def review(Closure closure){
         spider.reviewPage = closure
+    }
+
+    /**
+     * 抓取完后，总体回顾一下
+     * @param closure
+     * @return
+     */
+    def reviewCrawl(Closure closure){
+        spider.reviewCrawl = closure
     }
 }

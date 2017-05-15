@@ -12,6 +12,7 @@ import org.jsoup.nodes.Document
  */
 @Slf4j
 class Page {
+    String crawlName
     String url = ''
     String text = ''
     boolean fail = false

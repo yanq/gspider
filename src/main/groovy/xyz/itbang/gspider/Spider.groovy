@@ -12,6 +12,7 @@ import java.util.regex.Pattern
  */
 @Slf4j
 class Spider{
+    String crawlName = "GSpider"
     int maxRoundCount = 3
     int maxFetchCount = 100
     int maxThreadCount  = 3
@@ -22,6 +23,7 @@ class Spider{
     List<Pattern> excludeRegexList = new ArrayList<>()
     Map<Pattern,Closure> handlers = new HashMap<>()
     Closure reviewPage
+    Closure reviewCrawl
 
     void completeInit(){
         if (!service) service = Executors.newFixedThreadPool(maxThreadCount)
@@ -29,8 +31,10 @@ class Spider{
     }
 
     void start(){
-        log.info("Spider starting ...")
         Date start = new Date()
+        crawlName = crawlName+"@${start.time}"
+        log.info("$crawlName starting ...")
+
 
         completeInit()
 
@@ -42,14 +46,14 @@ class Spider{
                 new Callable<Object>() {
                     @Override
                     Object call() {
-                        Page page = new Page(url: link, currentRound: round)
+                        Page page = new Page(url: link, currentRound: round,crawlName: crawlName)
                         try {
                             process(page)
                         }catch (Exception e){
                             page.markAsFailed()
                             e.printStackTrace()
                         }
-                        reviewPage.call(page)
+                        reviewPage?.call(page)
                     }
                 }
             }
@@ -57,7 +61,10 @@ class Spider{
         }
         service.shutdown()
 
-        log.info("Crawl over,fetch totle ${roundLinks.values()*.size().sum()} , total time ${(new Date().time - start.time)/1000} s .")
+        Date end = new Date()
+        reviewCrawl?.call(this,start,end)
+
+        log.info("Crawl over,fetch totle ${roundLinksTotal()} , total time ${(end.time - start.time)/1000} s .")
     }
     //process
     void process(Page page){
@@ -113,7 +120,7 @@ class Spider{
         return roundLinks[i]
     }
 
-    private int roundLinksTotal(){
+    int roundLinksTotal(){
         return roundLinks.values()*.size().sum()
     }
 

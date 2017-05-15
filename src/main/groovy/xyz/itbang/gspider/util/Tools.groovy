@@ -15,6 +15,11 @@ class Tools {
         cookieManager.setDefault(cookieManager)
     }
 
+    /**
+     * 暂停并等待，直到用户输入 yes。
+     * 用于需要登录页面等，给用户时间处理。
+     * @param message
+     */
     static void waitFor(String message){
         println("Waiting for $message")
         Scanner scanner = new Scanner(System.in)

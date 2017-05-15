@@ -12,14 +12,19 @@ class SpiderTest extends GroovyTestCase {
 
     //官方示例
     void testSpider() {
-        def list = ["http://www.luofans.com/","http://www.luofans.com/audios",luofans]
+        def list = "http://luoyouzhijia.cn"
         Spider.crawl {
+            name "测试爬虫"
             seeds list
             rounds 1
             handle { Page page ->
                 println("Handle -> " + page.url)
                 //Tools.waitFor("登录") //noway
                 println("Title -> " + page.document.title())
+            }
+
+            reviewCrawl {Spider spider,Date start,Date end ->
+                println("Crawl over,${spider.crawlName}")
             }
         }
     }
