@@ -7,20 +7,20 @@ import xyz.itbang.gspider.util.Tools
  */
 class SpiderTest extends GroovyTestCase {
 
-    String luofans = "http://luofans.com:8080"
+    String luofans = "http://luoyouzhijia.cn"
     String localHi = "http://localhost:8080/hi"
 
     //官方示例
     void testSpider() {
-        def list = "http://luoyouzhijia.cn"
+        def list = luofans
         Spider.crawl {
-            name "测试爬虫"
+            name "爬"
             seeds list
             rounds 1
             handle { Page page ->
                 println("Handle -> " + page.url)
                 //Tools.waitFor("登录") //noway
-                println("Title -> " + page.document.title())
+                println("Title -> ${page.document.title()}, Time ${page.time} ms")
             }
 
             reviewCrawl {Spider spider,Date start,Date end ->

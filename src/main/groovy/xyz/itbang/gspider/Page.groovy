@@ -19,6 +19,7 @@ class Page {
     List<String> links = new ArrayList<>()
     Map<String, Object> data = new HashMap<>()
     Date startAt, downloadEndAt, endAt
+    long time //耗时，毫秒
     //download
     int currentRound = 1
     int failRetryCount = 1
@@ -83,7 +84,7 @@ class Page {
     }
 
     void download(){
-        startAt = new Date()
+        startDownload()
         try {
             text = connection.execute().body()
         }catch (Exception e){
@@ -102,7 +103,15 @@ class Page {
                 }
             }
         }
+        overDownload()
+    }
+
+    void startDownload(){
+        startAt = new Date()
+    }
+    void overDownload(){
         downloadEndAt = new Date()
+        time = downloadEndAt.time - startAt.time
     }
 
     String toString() {
