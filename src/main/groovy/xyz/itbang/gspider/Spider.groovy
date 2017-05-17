@@ -49,15 +49,15 @@ class Spider{
                         Page page = new Page(crawlName,round,link)
                         try {
                             process(page)
+                            page.endAt = new Date()
+                            reviewPage?.call(page)
                         } catch (Exception e) {
                             page.markAsFailed()
                             e.printStackTrace()
                         } finally {
-                            page.endAt = new Date()
+                            page.endAt = page.endAt ?: new Date() //避免被异常吞掉
                             log.debug("Process url ${page.url} over, use time ${(page.endAt.time - page.startAt.time)/1000} s")
                         }
-
-                        reviewPage?.call(page)
                     }
                 }
             }
