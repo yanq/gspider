@@ -12,19 +12,19 @@ class SpiderTest extends GroovyTestCase {
 
     //官方示例
     void testSpider() {
-        def list = luofans
+        def list = [luofans]
         Spider.crawl {
             name "爬"
             seeds list
             rounds 1
+
             handle { Page page ->
                 println("Handle -> " + page.url)
-                //Tools.waitFor("登录") //noway
-                println("Title -> ${page.document.title()}, Time ${page.time} ms")
+                println("Title -> " + page.document.title())
             }
 
-            reviewCrawl {Spider spider,Date start,Date end ->
-                println("Crawl over,${spider.crawlName}")
+            review { Page page ->
+                println("Time -> ${page.endAt.time - page.startAt.time} ms")
             }
         }
     }
@@ -58,7 +58,7 @@ class SpiderTest extends GroovyTestCase {
         println pageLuofans.document.select('a')*.attr('href')
     }
 
-    void testWaitFor(){
+    void testWaitFor() {
         //Tools.waitFor("Login,登录") //貌似测试运行时，无法从控制台读取数据，直接运行就可以。
     }
 
