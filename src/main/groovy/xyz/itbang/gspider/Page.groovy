@@ -18,8 +18,8 @@ class Page {
     boolean fail = false
     List<String> links = new ArrayList<>()
     Map<String, Object> data = new HashMap<>()
-    Date startAt, downloadEndAt, endAt
-    long time //耗时，毫秒
+    Date startAt,downloadStartAt, downloadEndAt, endAt
+    long downloadTime //耗时，毫秒
     //download
     int currentRound = 1
     int failRetryCount = 1
@@ -29,6 +29,14 @@ class Page {
     private Document _document
     private Object _json
     private _id
+
+
+    Page(String crawlName,int currentRound,String url){
+        this.crawlName = crawlName
+        this.currentRound = currentRound
+        this.url = url
+        this.startAt = new Date()
+    }
 
     String getId(){
         _id ?: (_id = UUID.randomUUID().toString())
@@ -107,11 +115,11 @@ class Page {
     }
 
     void startDownload(){
-        startAt = new Date()
+        downloadStartAt = new Date()
     }
     void overDownload(){
         downloadEndAt = new Date()
-        time = downloadEndAt.time - startAt.time
+        downloadTime = downloadEndAt.time - downloadStartAt.time
     }
 
     String toString() {

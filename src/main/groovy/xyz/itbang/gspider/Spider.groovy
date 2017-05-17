@@ -21,7 +21,7 @@ class Spider{
     ExecutorService service
     List<Pattern> includeRegexList = new ArrayList<>()
     List<Pattern> excludeRegexList = new ArrayList<>()
-    Map<Pattern,Closure> handlers = new HashMap<>()
+    Map<Pattern,Closure> handlers = new LinkedHashMap<>()
     Closure reviewPage
     Closure reviewCrawl
 
@@ -46,13 +46,17 @@ class Spider{
                 new Callable<Object>() {
                     @Override
                     Object call() {
-                        Page page = new Page(url: link, currentRound: round,crawlName: crawlName)
+                        Page page = new Page(crawlName,round,link)
                         try {
                             process(page)
-                        }catch (Exception e){
+                        } catch (Exception e) {
                             page.markAsFailed()
                             e.printStackTrace()
+                        } finally {
+                            page.endAt = new Date()
+                            log.debug("Process url ${page.url} over, use time ${(page.endAt.time - page.startAt.time)/1000} s")
                         }
+
                         reviewPage?.call(page)
                     }
                 }
@@ -77,9 +81,6 @@ class Spider{
         }
 
         parserLinks(page)
-
-        page.endAt = new Date()
-        log.debug("Process url ${page.url} over, use time ${(page.endAt.time - page.startAt.time)/1000} s")
     }
 
     void parserLinks(Page page) {
