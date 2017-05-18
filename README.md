@@ -13,7 +13,7 @@ a Groovy Spider,make crawl easy.
 [code file](https://github.com/yanq/gspider/blob/master/src/main/groovy/example/Simple.groovy)
 ```
         Spider.crawl {
-            seeds "http://www.luofans.com/"
+            seeds "http://www.luoyouzhijia.cn/"
             handle { Page page ->
                 println("Handle -> " + page.url)
                 println("Title -> " + page.document.title())
