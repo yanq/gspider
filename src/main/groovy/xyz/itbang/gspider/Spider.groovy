@@ -94,9 +94,11 @@ class Spider{
             }
         } else {
             page.document.select("a[href]")*.attr('href').each {
+                def href = it.toString()
                 //这里根据规则过滤
-                def link = reorganize(page, it.toString())
-                if (!includeOutSite && !link.startsWith(page.host)) return
+                if (["javascript:", "mailto:","#"].find { href.contains(it) }) return
+                def link = reorganize(page, href)
+                if (!includeOutSite && !inSite(page,link)) return
                 if (excludeRegexList && excludeRegexList.find { it.matcher(link).matches() }) return
                 if (includeRegexList && !includeRegexList.find { it.matcher(link).matches() }) return
 
@@ -107,7 +109,6 @@ class Spider{
 
         page.links.each {
             String url = it.trim()
-            if (["javascript:", "mailto:", "#"].find { url.contains(it) }) return
             if (!roundLinks.values().find { it.contains(url) } && roundLinksTotal() < maxFetchCount) {
                 getRoundLinkSet(page.currentRound + 1).add(it)
             } else {
@@ -126,7 +127,14 @@ class Spider{
     }
 
     private String reorganize(Page page, String url) {
-        url.contains('://') ? url : "${page.host}/${!url.startsWith('/') ? url : url.substring(1)}"
+        if (url.matches('https?://')) return url
+        if (url.startsWith('//')) return "${page.uri.scheme}:$url"
+        return "${page.host}/${!url.startsWith('/') ? url : url.substring(1)}"
+    }
+    //本站的子域名，要包含在内
+    private boolean inSite(Page page, String url){
+        def baseDomain = page.uri.host.split('\\.')[-2,-1].join('.')
+        return url.contains(baseDomain)
     }
 
 
