@@ -10,7 +10,6 @@ a Groovy Spider,make crawl easy.
 - out of box of multithread,text clean,url filter and so on. 开箱即用的多线程，文本分析清洗，过滤URL等等。
 
 ## Example 示例
-[code file](https://github.com/yanq/gspider/blob/master/src/main/groovy/example/Simple.groovy)
 ```
         Spider.crawl {
             seeds "http://www.luoyouzhijia.cn/"
@@ -20,6 +19,7 @@ a Groovy Spider,make crawl easy.
             }
         }
 ```
+[more example 更多示例](https://github.com/yanq/gspider-example)
 > **Warning 注意**
 > 
 > Do not fetch too much before change the seeds，just for test。
@@ -27,6 +27,7 @@ a Groovy Spider,make crawl easy.
 > 别抓太多哈，这个网站可是我亲儿子，别整坏了。
 
 ## How to use  咋用
+Gradle code
 ```
 compile 'xyz.itbang:gspider:1.2'
 ```
@@ -48,7 +49,7 @@ WebMagic，那哥们说要搞成 Java 界的教科书式爬虫，比肩 Scrapy �
 
 真搞出来还有点小兴奋，想整点82年的拉菲压压，也没有找到，谁有？送点？
 
-吹完牛了，该谦虚谨慎地干活了。欢迎大家点赞，fork，欢迎意见建议，我的微信 jackyanq，靠这个赚了钱的，欢迎打赏。
+吹完牛了，该谦虚谨慎地干活了。
 
-再次感谢您看我叨叨了这么多，我都怀疑自己更年期了！
+欢迎大家点赞，fork，欢迎意见建议，我的微信 jackyanq，靠这个赚了钱的，欢迎打赏。
 
