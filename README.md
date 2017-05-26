@@ -2,7 +2,7 @@
 
 a Groovy Spider,make crawl easy.
 
-一个基于 Groovy 语言的 Spider，让抓取更简单。
+一个基于 Java/Groovy 语言的 Spider，让抓取更简单。
 
 ## Feature 特性
 - easy to use,support crawl dsl. 简单易用，支持抓取DSL。
@@ -29,7 +29,7 @@ a Groovy Spider,make crawl easy.
 ## How to use  咋用
 Gradle code
 ```
-compile 'xyz.itbang:gspider:1.2'
+compile 'xyz.itbang:gspider:1.3.0'
 ```
 
 ## Something to say 吹点牛
