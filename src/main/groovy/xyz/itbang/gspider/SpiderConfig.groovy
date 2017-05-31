@@ -1,6 +1,7 @@
 package xyz.itbang.gspider
 
 import xyz.itbang.gspider.handler.AbstractHandler
+import xyz.itbang.gspider.handler.Handler
 
 import java.util.regex.Pattern
 
@@ -120,6 +121,17 @@ class SpiderConfig {
                 return page
             }
         })
+    }
+
+    /**
+     * 直接增加 handler 列表
+     * @param l
+     * @return
+     */
+    def handlers(Class<Handler> ...hs){
+        hs.each {
+            spider.handlerList.add(it.newInstance())
+        }
     }
 
     /**
