@@ -10,6 +10,8 @@ abstract class AbstractHandler implements Handler {
 
     String pattern = '.*'
 
+    AbstractHandler(){}
+
     AbstractHandler(String pattern){
         this.pattern = pattern
     }

@@ -1,5 +1,6 @@
 package xyz.itbang.gspider
 
+import xyz.itbang.gspider.handler.AbstractHandler
 import xyz.itbang.gspider.util.Tools
 
 /**
@@ -16,8 +17,9 @@ class SpiderTest extends GroovyTestCase {
         Spider.crawl {
             name "爬"
             seeds list
-            thread(1)
+            thread 1
             rounds 2
+            maxFetch 10
 
             handle { Page page ->
                 println("Handle -> " + page.url)
@@ -27,6 +29,8 @@ class SpiderTest extends GroovyTestCase {
             handle('.*audio.*') { Page page ->
                 println("Audio -> ${page.document.title()}")
             }
+
+            handlers DefaultHandler
 
             review { Page page ->
                 println("Time -> ${page.endAt.time - page.startAt.time} ms")
@@ -39,6 +43,7 @@ class SpiderTest extends GroovyTestCase {
         Spider spider = new Spider()
         println spider.reorganize(page, 'a')
         println spider.reorganize(page, "http://a.com")
+        println spider.reorganize(page, "https://a.com")
     }
 
     void testPageHTML() {
@@ -67,4 +72,10 @@ class SpiderTest extends GroovyTestCase {
         //Tools.waitFor("Login,登录") //貌似测试运行时，无法从控制台读取数据，直接运行就可以。
     }
 
+    class DefaultHandler extends AbstractHandler{
+        @Override
+        Page handlePage(Page page) {
+            println "Info from default handler @　$page"
+        }
+    }
 }

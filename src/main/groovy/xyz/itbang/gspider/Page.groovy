@@ -30,6 +30,7 @@ class Page {
     private Object _json
     private _id
 
+    Page(){}
 
     Page(String crawlName,int currentRound,String url){
         this.crawlName = crawlName

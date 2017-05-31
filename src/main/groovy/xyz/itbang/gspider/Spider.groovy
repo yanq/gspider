@@ -127,7 +127,7 @@ class Spider{
     }
 
     private String reorganize(Page page, String url) {
-        if (url.matches('https?://')) return url
+        if (url.startsWith('http://') || url.startsWith('https://')) return url
         if (url.startsWith('//')) return "${page.uri.scheme}:$url"
         return "${page.host}/${!url.startsWith('/') ? url : url.substring(1)}"
     }
