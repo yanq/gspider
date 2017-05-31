@@ -13,4 +13,5 @@ import java.util.Set;
 public interface Scheduler {
     void config(int threadCount, List<Handler> handlers);
     List<Page> dealRoundLinks(String crawlName, int round, Set<String> links);
+    void shutdown();
 }

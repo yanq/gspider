@@ -48,4 +48,9 @@ class LocalScheduler implements Scheduler {
         service.invokeAll(tasks)
         return results
     }
+
+    @Override
+    void shutdown() {
+        this.service.shutdown()
+    }
 }

@@ -57,6 +57,8 @@ class Spider{
             }
         }
 
+        scheduler.shutdown()
+
         Date end = new Date()
         reviewCrawl?.call(this,start,end)
 
