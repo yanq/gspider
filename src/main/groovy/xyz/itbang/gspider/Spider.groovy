@@ -2,10 +2,8 @@ package xyz.itbang.gspider
 
 import groovy.util.logging.Slf4j
 import xyz.itbang.gspider.handler.Handler
-
-import java.util.concurrent.Callable
-import java.util.concurrent.ExecutorService
-import java.util.concurrent.Executors
+import xyz.itbang.gspider.scheduler.LocalScheduler
+import xyz.itbang.gspider.scheduler.Scheduler
 import java.util.regex.Pattern
 
 /**
@@ -20,7 +18,7 @@ class Spider{
     int maxThreadCount  = 3
     boolean includeOutSite = false
     Map<Integer, HashSet<String>> roundLinks = new HashMap<Integer, HashSet<String>>()
-    ExecutorService service
+    Scheduler scheduler
     List<Pattern> includeRegexList = new ArrayList<>()
     List<Pattern> excludeRegexList = new ArrayList<>()
     List<Handler> handlerList = new ArrayList<>()
@@ -28,7 +26,8 @@ class Spider{
     Closure reviewCrawl
 
     void completeInit(){
-        if (!service) service = Executors.newFixedThreadPool(maxThreadCount)
+        if (!scheduler) scheduler = new LocalScheduler()
+        scheduler.config(maxThreadCount, handlerList)
         log.info("Config : round $maxRoundCount ,maxFetch $maxFetchCount ,thread $maxThreadCount ,seeds ${getRoundLinkSet(1)} .")
     }
 
@@ -41,46 +40,27 @@ class Spider{
         completeInit()
 
         maxRoundCount.times {
-            def round = it+1,links = getRoundLinkSet(round).value
+            int round = it+1
+            Set<String> links = getRoundLinkSet(round).value
             log.info("Start round ${round} ,total ${links.size()} ...")
-            def tasks = links.collect{
-                def link = it.toString()
-                new Callable<Object>() {
-                    @Override
-                    Object call() {
-                        Page page = new Page(crawlName,round,link)
-                        try {
-                            process(page)
-                            page.endAt = new Date()
-                            reviewPage?.call(page)
-                        } catch (Exception e) {
-                            page.markAsFailed()
-                            e.printStackTrace()
-                        } finally {
-                            page.endAt = page.endAt ?: new Date() //避免被异常吞掉
-                            log.debug("Process url ${page.url} over, use time ${(page.endAt.time - page.startAt.time)/1000} s")
-                        }
-                    }
+
+            def pages = scheduler.dealRoundLinks(crawlName,round,links)
+
+            pages.each {
+                try {
+                    parserLinks(it)
+                    reviewPage?.call(it)
+                } catch (Exception e) {
+                    e.printStackTrace()
+                    it.markAsFailed()
                 }
             }
-            service.invokeAll(tasks)
         }
-        service.shutdown()
 
         Date end = new Date()
         reviewCrawl?.call(this,start,end)
 
         log.info("Crawl over,fetch totle ${roundLinksTotal()} , total time ${(end.time - start.time)/1000} s .")
-    }
-    //process
-    void process(Page page){
-        log.debug("Process url ${page.url}")
-
-        handlerList.each {
-            if (it.matches(page.url)) it.handle(page)
-        }
-
-        parserLinks(page)
     }
 
     void parserLinks(Page page) {

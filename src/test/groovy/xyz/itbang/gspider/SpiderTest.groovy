@@ -17,9 +17,10 @@ class SpiderTest extends GroovyTestCase {
         Spider.crawl {
             name "爬"
             seeds list
-            thread 1
-            rounds 2
-            maxFetch 10
+            thread 2
+            rounds 3
+            maxFetch 100
+            include '.*audios/\\d.*'
 
             handle { Page page ->
                 println("Handle -> " + page.url)
@@ -34,6 +35,10 @@ class SpiderTest extends GroovyTestCase {
 
             review { Page page ->
                 println("Time -> ${page.endAt.time - page.startAt.time} ms")
+            }
+
+            reviewCrawl {Spider spider,Date startAt,Date endAt ->
+                println "Status : $spider.crawlName --- $startAt - $endAt"
             }
         }
     }
