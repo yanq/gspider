@@ -1,6 +1,8 @@
 package xyz.itbang.gspider
 
 import groovy.util.logging.Slf4j
+import xyz.itbang.gspider.handler.Handler
+
 import java.util.concurrent.Callable
 import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
@@ -21,7 +23,7 @@ class Spider{
     ExecutorService service
     List<Pattern> includeRegexList = new ArrayList<>()
     List<Pattern> excludeRegexList = new ArrayList<>()
-    Map<Pattern,Closure> handlers = new LinkedHashMap<>()
+    List<Handler> handlerList = new ArrayList<>()
     Closure reviewPage
     Closure reviewCrawl
 
@@ -74,10 +76,8 @@ class Spider{
     void process(Page page){
         log.debug("Process url ${page.url}")
 
-        handlers.each {
-            if (it.key.matcher(page.url).matches()){
-                it.value.call(page)
-            }
+        handlerList.each {
+            if (it.matches(page.url)) it.handle(page)
         }
 
         parserLinks(page)

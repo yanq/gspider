@@ -16,11 +16,16 @@ class SpiderTest extends GroovyTestCase {
         Spider.crawl {
             name "爬"
             seeds list
-            rounds 1
+            thread(1)
+            rounds 2
 
             handle { Page page ->
                 println("Handle -> " + page.url)
                 println("Title -> " + page.document.title())
+            }
+
+            handle('.*audio.*') { Page page ->
+                println("Audio -> ${page.document.title()}")
             }
 
             review { Page page ->

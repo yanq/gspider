@@ -1,5 +1,6 @@
 package xyz.itbang.gspider
 
+import xyz.itbang.gspider.handler.AbstractHandler
 
 import java.util.regex.Pattern
 
@@ -112,7 +113,13 @@ class SpiderConfig {
      * @return
      */
     def handle(String pattern,Closure closure){
-        spider.handlers.put(Pattern.compile(pattern),closure)
+        spider.handlerList.add(new AbstractHandler(pattern) {
+            @Override
+            Page handlePage(Page page) {
+                closure.call(page)
+                return page
+            }
+        })
     }
 
     /**

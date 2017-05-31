@@ -14,8 +14,7 @@ repositories {
 }
 
 dependencies {
-    compile 'org.codehaus.groovy:groovy:2.4.10'
-    compile 'org.codehaus.groovy:groovy-json:2.4.10'
+    compile 'org.codehaus.groovy:groovy-all:2.4.10'
     compile 'org.jsoup:jsoup:1.10.2'
     compile 'org.slf4j:slf4j-api:1.7.22'
 
