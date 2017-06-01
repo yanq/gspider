@@ -12,4 +12,5 @@ import java.util.Set;
  */
 public interface Scheduler {
     List<Page> dealRoundLinks(String crawlName, int round, Set<String> links);
+    void shutdown();
 }

@@ -71,6 +71,7 @@ class Spider{
             }
         }
 
+        scheduler.shutdown()
         service?.shutdown() //有些调度器不需要多线程，并未初始化之。
 
         Date end = new Date()
@@ -84,7 +85,7 @@ class Spider{
 
         HessianClientSpider clientSpider = new HessianClientSpider(serviceURL,handlerList)
         int idleCount = 0
-        int maxIdleCount = 1
+        int maxIdleCount = 10
         int idleSleepTime = 3000
         maxThreadCount.times {
             def t = new Thread(new Runnable() {
@@ -106,6 +107,7 @@ class Spider{
         }
 
         while (true){
+            //println("idle count $idleCount")
             if (idleCount >= maxIdleCount*maxThreadCount){
                 log.info("Client spider idle too long ,about ${(idleSleepTime*idleCount)/maxThreadCount} ms,it will shutdown now .")
                 break

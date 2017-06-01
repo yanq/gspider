@@ -14,6 +14,11 @@ import xyz.itbang.gspider.scheduler.Scheduler
 @Slf4j
 class HessianServerScheduler implements Scheduler {
     Server server
+
+    @Override
+    void shutdown() {
+        server.stop()
+    }
     static LinkedList<Page> toDealLinks
     static List<Page> toDealPages
 
