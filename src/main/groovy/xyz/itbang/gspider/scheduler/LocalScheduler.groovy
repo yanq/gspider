@@ -15,9 +15,8 @@ class LocalScheduler implements Scheduler {
     ExecutorService service
     List<Handler> handlerList
 
-    @Override
-    void config(int threadCount, List<Handler> handlerList) {
-        this.service = Executors.newFixedThreadPool(threadCount)
+    LocalScheduler(ExecutorService service,List<Handler> handlerList){
+        this.service = service
         this.handlerList = handlerList
     }
 
@@ -47,10 +46,5 @@ class LocalScheduler implements Scheduler {
         }
         service.invokeAll(tasks)
         return results
-    }
-
-    @Override
-    void shutdown() {
-        this.service.shutdown()
     }
 }

@@ -4,6 +4,8 @@ import groovy.util.logging.Slf4j
 import xyz.itbang.gspider.handler.Handler
 import xyz.itbang.gspider.scheduler.LocalScheduler
 import xyz.itbang.gspider.scheduler.Scheduler
+import java.util.concurrent.ExecutorService
+import java.util.concurrent.Executors
 import java.util.regex.Pattern
 
 /**
@@ -16,6 +18,7 @@ class Spider{
     int maxRoundCount = 3
     int maxFetchCount = 100
     int maxThreadCount  = 3
+    ExecutorService service
     boolean includeOutSite = false
     Map<Integer, HashSet<String>> roundLinks = new HashMap<Integer, HashSet<String>>()
     Scheduler scheduler
@@ -26,8 +29,8 @@ class Spider{
     Closure reviewCrawl
 
     void completeInit(){
-        if (!scheduler) scheduler = new LocalScheduler()
-        scheduler.config(maxThreadCount, handlerList)
+        if (!service) service = Executors.newFixedThreadPool(maxThreadCount)
+        if (!scheduler) scheduler = new LocalScheduler(service,handlerList)
         log.info("Config : round $maxRoundCount ,maxFetch $maxFetchCount ,thread $maxThreadCount ,seeds ${getRoundLinkSet(1)} .")
     }
 
@@ -57,7 +60,7 @@ class Spider{
             }
         }
 
-        scheduler.shutdown()
+        service.shutdown()
 
         Date end = new Date()
         reviewCrawl?.call(this,start,end)

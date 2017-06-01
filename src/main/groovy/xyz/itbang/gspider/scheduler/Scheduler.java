@@ -11,7 +11,5 @@ import java.util.Set;
  * Created by yan on 2017/5/31.
  */
 public interface Scheduler {
-    void config(int threadCount, List<Handler> handlers);
     List<Page> dealRoundLinks(String crawlName, int round, Set<String> links);
-    void shutdown();
 }

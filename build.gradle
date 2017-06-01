@@ -18,6 +18,10 @@ dependencies {
     compile 'org.jsoup:jsoup:1.10.2'
     compile 'org.slf4j:slf4j-api:1.7.22'
 
+    //jetty
+    compile 'org.eclipse.jetty.aggregate:jetty-all:9.4.5.v20170502'//hessian
+    compile 'com.caucho:hessian:4.0.38'
+
     runtime 'ch.qos.logback:logback-classic:1.2.1'
 
     testCompile 'junit:junit:4.11'
