@@ -2,6 +2,8 @@ package xyz.itbang.gspider
 
 import groovy.util.logging.Slf4j
 import xyz.itbang.gspider.handler.Handler
+import xyz.itbang.gspider.remote.HessianClientSpider
+import xyz.itbang.gspider.remote.HessianServerScheduler
 import xyz.itbang.gspider.scheduler.LocalScheduler
 import xyz.itbang.gspider.scheduler.Scheduler
 import java.util.concurrent.ExecutorService
@@ -14,6 +16,8 @@ import java.util.regex.Pattern
  */
 @Slf4j
 class Spider{
+    static List<String> roles = ['alone','server','client']
+
     String crawlName = "GSpider"
     int maxRoundCount = 3
     int maxFetchCount = 100
@@ -27,20 +31,27 @@ class Spider{
     List<Handler> handlerList = new ArrayList<>()
     Closure reviewPage
     Closure reviewCrawl
+    //分布式配置
+    String role = 'alone' // alone 独立，server 服务端，client 客户端
+    String serviceURL = "http://localhost:8080/service"
 
-    void completeInit(){
-        if (!service) service = Executors.newFixedThreadPool(maxThreadCount)
-        if (!scheduler) scheduler = new LocalScheduler(service,handlerList)
-        log.info("Config : round $maxRoundCount ,maxFetch $maxFetchCount ,thread $maxThreadCount ,seeds ${getRoundLinkSet(1)} .")
-    }
-
+    //启动，独立或者服务端。
     void start(){
         Date start = new Date()
         crawlName = crawlName+"@${start.time}"
         log.info("$crawlName starting ...")
 
+        //初始化调度器
+        if (role == 'alone'){
+            service = Executors.newFixedThreadPool(maxThreadCount)
+            scheduler = new LocalScheduler(service,handlerList)
+        }else if (role == 'server'){
+            HessianServerScheduler hessianServerScheduler = new HessianServerScheduler()
+            hessianServerScheduler.startService(serviceURL)
+            scheduler = hessianServerScheduler
+        }
 
-        completeInit()
+        log.info("Config : round $maxRoundCount ,maxFetch $maxFetchCount ,thread $maxThreadCount ,seeds ${getRoundLinkSet(1)} .")
 
         maxRoundCount.times {
             int round = it+1
@@ -60,12 +71,48 @@ class Spider{
             }
         }
 
-        service.shutdown()
+        service?.shutdown() //有些调度器不需要多线程，并未初始化之。
 
         Date end = new Date()
         reviewCrawl?.call(this,start,end)
 
         log.info("Crawl over,fetch totle ${roundLinksTotal()} , total time ${(end.time - start.time)/1000} s .")
+    }
+
+    void startClient(){
+        log.info("Starting client spider,${maxThreadCount} thread ")
+
+        HessianClientSpider clientSpider = new HessianClientSpider(serviceURL,handlerList)
+        int idleCount = 0
+        int maxIdleCount = 1
+        int idleSleepTime = 3000
+        maxThreadCount.times {
+            def t = new Thread(new Runnable() {
+                @Override
+                void run() {
+                    while (true){
+                        try {
+                            clientSpider.process()
+                            idleCount = 0
+                        }catch (Exception e){
+                            log.warn("Exception : ${e.getMessage()} ,sleep ${idleSleepTime} ...")
+                            sleep(idleSleepTime)
+                            idleCount = idleCount+1
+                        }
+                    }
+                }
+            })
+            t.start()
+        }
+
+        while (true){
+            if (idleCount >= maxIdleCount*maxThreadCount){
+                log.info("Client spider idle too long ,about ${(idleSleepTime*idleCount)/maxThreadCount} ms,it will shutdown now .")
+                break
+            }else {
+                sleep(1000)
+            }
+        }
     }
 
     void parserLinks(Page page) {
@@ -131,6 +178,14 @@ class Spider{
         code.resolveStrategy = Closure.DELEGATE_ONLY
         code()
 
-        spider.start()
+        if (spider.role in roles){
+            if (spider.role == 'client'){
+                spider.startClient()
+            }else {
+                spider.start()
+            }
+        } else {
+            throw new Exception("Role ${spider.role} not in roles ${roles}")
+        }
     }
 }

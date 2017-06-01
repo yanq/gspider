@@ -11,7 +11,7 @@ import org.jsoup.nodes.Document
  * Created by yan on 2017/2/13.
  */
 @Slf4j
-class Page {
+class Page implements Serializable{
     String crawlName
     String url = ''
     String text = ''
@@ -24,10 +24,10 @@ class Page {
     int currentRound = 1
     int failRetryCount = 1
     // for cache read only properties
-    private Connection _connection
-    private URI _uri
-    private Document _document
-    private Object _json
+    private transient Connection _connection
+    private transient URI _uri
+    private transient Document _document
+    private transient Object _json
     private _id
 
     Page(){}

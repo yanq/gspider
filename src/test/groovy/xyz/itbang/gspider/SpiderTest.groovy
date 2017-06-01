@@ -15,6 +15,7 @@ class SpiderTest extends GroovyTestCase {
     void testSpider() {
         def list = [luofans]
         Spider.crawl {
+            role 'server'
             name "爬"
             seeds list
             thread 2
@@ -33,13 +34,20 @@ class SpiderTest extends GroovyTestCase {
 
             handlers DefaultHandler
 
-            review { Page page ->
-                println("Time -> ${page.endAt.time - page.startAt.time} ms")
-            }
+//            review { Page page ->
+//                println("Time -> ${page.endAt.time - page.startAt.time} ms")
+//            }
+//
+//            reviewCrawl {Spider spider,Date startAt,Date endAt ->
+//                println "Status : $spider.crawlName --- $startAt - $endAt"
+//            }
+        }
+    }
 
-            reviewCrawl {Spider spider,Date startAt,Date endAt ->
-                println "Status : $spider.crawlName --- $startAt - $endAt"
-            }
+    void testClient(){
+        Spider.crawl {
+            role 'client'
+            handlers DefaultHandler
         }
     }
 

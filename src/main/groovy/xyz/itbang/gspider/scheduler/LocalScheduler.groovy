@@ -38,7 +38,7 @@ class LocalScheduler implements Scheduler {
                         page.markAsFailed()
                     } finally {
                         page.endAt = new Date()
-                        log.debug("Process url ${page.url} over, use time ${(page.endAt.time - page.startAt.time)/1000} s")
+                        log.debug("Process url ${page.url} , use time ${page.endAt.time - page.startAt.time} ms")
                     }
                     results << page
                 }

@@ -17,6 +17,25 @@ class SpiderConfig {
     }
 
     /**
+     * 设置角色
+     * alone（默认），server，client
+     * @param role
+     * @return
+     */
+    def role(String role){
+        spider.role = role
+    }
+    /**
+     * 设置分布式的服务地址
+     * 服务端会从这里获取端口并初始化，客户端从这里获取服务地址
+     * @param url
+     * @return
+     */
+    def serviceUrl(String url){
+        spider.serviceURL = url
+    }
+
+    /**
      * 定义抓取的名称前缀，每次抓取会生成一个名称@时间的抓取名称。
      * @param name
      * @return
