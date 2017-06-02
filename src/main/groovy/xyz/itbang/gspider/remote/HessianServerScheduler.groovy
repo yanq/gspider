@@ -68,6 +68,7 @@ class HessianServerScheduler implements Scheduler {
 
         @Override
         String postTask(Page page) {
+            page.endAt = new Date()
             toDealPages.add(page)
             return 'success'
         }

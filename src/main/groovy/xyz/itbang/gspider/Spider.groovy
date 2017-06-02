@@ -62,8 +62,8 @@ class Spider{
 
             pages.each {
                 try {
-                    parserLinks(it)
                     reviewPage?.call(it)
+                    parserLinks(it)
                 } catch (Exception e) {
                     e.printStackTrace()
                     it.markAsFailed()
