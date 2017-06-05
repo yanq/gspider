@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Set;
 
 /**
+ * 调度器
  * Created by yan on 2017/5/31.
  */
 public interface Scheduler {
