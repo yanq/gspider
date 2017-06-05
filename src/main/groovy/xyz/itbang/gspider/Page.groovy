@@ -58,7 +58,7 @@ class Page implements Serializable{
     }
 
     URI getUri() {
-        _uri ?: (_uri = new URI(url))
+        _uri ?: (_uri = new URI(url.trim()))
     }
 
     Document getDocument(){

@@ -8,6 +8,7 @@ import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
 
 /**
+ * 本地调度器
  * Created by yan on 2017/5/31.
  */
 @Slf4j

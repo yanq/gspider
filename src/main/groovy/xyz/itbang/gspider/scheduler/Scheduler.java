@@ -7,7 +7,6 @@ import java.util.List;
 import java.util.Set;
 
 /**
- * 处理一轮的数据
  * Created by yan on 2017/5/31.
  */
 public interface Scheduler {
