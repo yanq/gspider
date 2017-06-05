@@ -48,9 +48,7 @@ class Spider{
             service = Executors.newFixedThreadPool(maxThreadCount)
             scheduler = new LocalScheduler(this)
         }else if (role == 'server'){
-            HessianServerScheduler hessianServerScheduler = new HessianServerScheduler()
-            hessianServerScheduler.startService(serviceURL)
-            scheduler = hessianServerScheduler
+            scheduler = new HessianServerScheduler(this)
         }
 
         log.info("Config : round $maxRoundCount ,maxFetch $maxFetchCount ,thread $maxThreadCount ,seeds ${getRoundLinkSet(1)} .")

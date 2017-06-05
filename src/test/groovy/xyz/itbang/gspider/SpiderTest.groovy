@@ -15,10 +15,10 @@ class SpiderTest extends GroovyTestCase {
     void testSpider() {
         def list = [luofans]
         Spider.crawl {
-            role 'server'
+            //role 'server'
             name "爬"
             seeds list
-            thread 2
+            thread 1
             rounds 3
             maxFetch 100
             include '.*audios/\\d.*'
@@ -32,7 +32,7 @@ class SpiderTest extends GroovyTestCase {
                 println("Audio -> ${page.document.title()}")
             }
 
-            handlers DefaultHandler
+            //handlers DefaultHandler
 
 //            review { Page page ->
 //                println("Time -> ${page.endAt.time - page.startAt.time} ms")

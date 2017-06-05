@@ -5,6 +5,7 @@ import groovy.util.logging.Slf4j
 import org.eclipse.jetty.server.Server
 import org.eclipse.jetty.servlet.ServletContextHandler
 import xyz.itbang.gspider.Page
+import xyz.itbang.gspider.Spider
 import xyz.itbang.gspider.scheduler.Scheduler
 
 /**
@@ -13,32 +14,32 @@ import xyz.itbang.gspider.scheduler.Scheduler
  */
 @Slf4j
 class HessianServerScheduler implements Scheduler {
+    static Spider spider
+    static LinkedList<String> toDealLinks
+    static int remainCount
     Server server
 
-    @Override
-    void shutdown() {
-        server.stop()
+    HessianServerScheduler(Spider spider) {
+        this.spider = spider
+        startService(spider.serviceURL)
     }
-    static LinkedList<Page> toDealLinks
-    static List<Page> toDealPages
 
     @Override
-    List<Page> dealRoundLinks(String crawlName, int round, Set<String> links) {
-        toDealLinks = Collections.synchronizedCollection(new LinkedList<Page>())
-        toDealPages = Collections.synchronizedList(new ArrayList<Page>())
-
+    void dealRoundLinks(String crawlName, int round, Set<String> links) {
+        toDealLinks = Collections.synchronizedCollection(new LinkedList<String>())
+        remainCount = links.size()
         links.each {
-            toDealLinks.add(new Page(crawlName,round,it.toString()))
+            toDealLinks.add(it.toString())
         }
 
         //一直等，直到都被处理，在等一会儿，就结束
-        while (true){
-            if (toDealLinks.size()>0){
+        while (true) {
+            if (toDealLinks.size() > 0) {
                 sleep(1000)
                 continue
             }
             sleep(2000)
-            if (toDealPages.size() >= links.size()) {
+            if (remainCount < 1) {
                 break
             }
             log.info("Waiting for last pages,just 10s ...")
@@ -46,8 +47,12 @@ class HessianServerScheduler implements Scheduler {
             break
         }
 
-        log.info("Deal round links ${links.size()},result pages ${toDealPages.size()}")
-        return toDealPages
+        log.info("Deal round : ${round} , links : ${links.size()}")
+    }
+
+    @Override
+    void shutdown() {
+        server.stop()
     }
 
     void startService(String url) {
@@ -63,14 +68,22 @@ class HessianServerScheduler implements Scheduler {
 
         @Override
         Page getTask(Map params) {
-            return toDealLinks.poll()
+            String link = toDealLinks.poll()
+            link ? new Page(spider.crawlName, spider.round, link) : null
         }
 
         @Override
         String postTask(Page page) {
             page.endAt = new Date()
-            toDealPages.add(page)
-            return 'success'
+            remainCount --
+            try {
+                spider.reviewPage?.call(page)
+                spider.parserLinks(page)
+                return 'success'
+            } catch (Exception e) {
+                e.printStackTrace()
+                return 'fail'
+            }
         }
     }
 }
