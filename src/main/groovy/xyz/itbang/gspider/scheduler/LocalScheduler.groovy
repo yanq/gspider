@@ -2,6 +2,7 @@ package xyz.itbang.gspider.scheduler
 
 import groovy.util.logging.Slf4j
 import xyz.itbang.gspider.Page
+import xyz.itbang.gspider.Spider
 import xyz.itbang.gspider.handler.Handler
 import java.util.concurrent.Callable
 import java.util.concurrent.ExecutorService
@@ -13,27 +14,27 @@ import java.util.concurrent.Executors
  */
 @Slf4j
 class LocalScheduler implements Scheduler {
-    ExecutorService service
-    List<Handler> handlerList
+    Spider spider
 
-    LocalScheduler(ExecutorService service,List<Handler> handlerList){
-        this.service = service
-        this.handlerList = handlerList
+    LocalScheduler(Spider spider){
+        this.spider = spider
     }
 
     @Override
-    List<Page> dealRoundLinks(String crawlName, int round, Set<String> links) {
-        def results = []
+    void dealRoundLinks(String crawlName, int round, Set<String> links) {
         def tasks = links.collect{
             def link = it.toString()
             new Callable<Object>() {
                 @Override
                 Object call() {
-                    Page page = new Page(crawlName,round,link)
+                    Page page = new Page(spider.crawlName,round,link)
                     try {
-                        handlerList.each {
+                        spider.handlerList.each {
                             if (it.matches(page.url)) it.handle(page)
                         }
+
+                        spider.reviewPage?.call(page)
+                        spider.parserLinks(page)
                     } catch (Exception e) {
                         e.printStackTrace()
                         page.markAsFailed()
@@ -41,12 +42,10 @@ class LocalScheduler implements Scheduler {
                         page.endAt = new Date()
                         log.debug("Process url ${page.url} , use time ${page.endAt.time - page.startAt.time} ms")
                     }
-                    results << page
                 }
             }
         }
-        service.invokeAll(tasks)
-        return results
+        spider.service.invokeAll(tasks)
     }
 
     @Override

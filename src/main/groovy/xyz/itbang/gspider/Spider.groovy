@@ -34,6 +34,8 @@ class Spider{
     //分布式配置
     String role = 'alone' // alone 独立，server 服务端，client 客户端
     String serviceURL = "http://localhost:8080/service"
+    //内部数据
+    int round = 1 //当前轮
 
     //启动，独立或者服务端。
     void start(){
@@ -44,7 +46,7 @@ class Spider{
         //初始化调度器
         if (role == 'alone'){
             service = Executors.newFixedThreadPool(maxThreadCount)
-            scheduler = new LocalScheduler(service,handlerList)
+            scheduler = new LocalScheduler(this)
         }else if (role == 'server'){
             HessianServerScheduler hessianServerScheduler = new HessianServerScheduler()
             hessianServerScheduler.startService(serviceURL)
@@ -54,21 +56,11 @@ class Spider{
         log.info("Config : round $maxRoundCount ,maxFetch $maxFetchCount ,thread $maxThreadCount ,seeds ${getRoundLinkSet(1)} .")
 
         maxRoundCount.times {
-            int round = it+1
+            round = it+1
             Set<String> links = getRoundLinkSet(round).value
             log.info("Start round ${round} ,total ${links.size()} ...")
 
-            def pages = scheduler.dealRoundLinks(crawlName,round,links)
-
-            pages.each {
-                try {
-                    reviewPage?.call(it)
-                    parserLinks(it)
-                } catch (Exception e) {
-                    e.printStackTrace()
-                    it.markAsFailed()
-                }
-            }
+            scheduler.dealRoundLinks(crawlName,round,links)
         }
 
         scheduler.shutdown()
