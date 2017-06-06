@@ -41,7 +41,7 @@ class Spider{
     void start(){
         Date start = new Date()
         crawlName = crawlName+"@${start.time}"
-        log.info("$crawlName starting ...")
+        log.info("Starting $role spider, $crawlName ...")
 
         //初始化调度器
         if (role == 'alone'){
