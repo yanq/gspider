@@ -104,6 +104,7 @@ class Spider{
     }
 
     void parserLinks(Page page) {
+        if (page.noMoreLinks) return
         if (page.currentRound >= maxRoundCount) return
         if (roundLinksTotal() >= maxFetchCount) return
 

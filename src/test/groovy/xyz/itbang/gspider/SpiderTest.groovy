@@ -18,14 +18,15 @@ class SpiderTest extends GroovyTestCase {
             //role 'server'
             name "爬"
             seeds list
-            thread 2
+            thread 1
             rounds 3
-            maxFetch 6
+            maxFetch 3
             include '.*audios/\\d.*'
 
             handle { Page page ->
                 println("Handle -> " + page.url)
                 println("Title -> " + page.document.title())
+                page.markNoMoreLinks()
             }
 
             handle('.*audio.*') { Page page ->

@@ -16,11 +16,11 @@ class Page implements Serializable{
     String url = ''
     String text = ''
     boolean fail = false
+    boolean noMoreLinks = false //要不要继续分析页面链接？用markNoMoreLinks()方法设置。
     List<String> links = new ArrayList<>()
     Map<String, Object> data = new HashMap<>()
     Date startAt,downloadStartAt, downloadEndAt, endAt
     long downloadTime //耗时，毫秒
-    //download
     int currentRound = 1
     int failRetryCount = 1
     // for cache read only properties
@@ -83,6 +83,10 @@ class Page implements Serializable{
 
     void markAsFailed() {
         fail = true
+    }
+
+    void markNoMoreLinks(){
+        noMoreLinks = true
     }
 
     void clearStatus() {
