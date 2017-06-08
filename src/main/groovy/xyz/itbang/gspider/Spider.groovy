@@ -90,20 +90,16 @@ class Spider{
                             sleep(idleSleepTime)
                             idleCount = idleCount+1
                         }
+
+                        //println("idle count $idleCount")
+                        if (idleCount >= maxIdleCount*maxThreadCount){
+                            log.info("Client spider idle too long ,about ${(idleSleepTime*idleCount)/maxThreadCount} ms,it will shutdown now .")
+                            break
+                        }
                     }
                 }
             })
             t.start()
-        }
-
-        while (true){
-            //println("idle count $idleCount")
-            if (idleCount >= maxIdleCount*maxThreadCount){
-                log.info("Client spider idle too long ,about ${(idleSleepTime*idleCount)/maxThreadCount} ms,it will shutdown now .")
-                break
-            }else {
-                sleep(1000)
-            }
         }
     }
 

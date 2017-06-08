@@ -18,9 +18,9 @@ class SpiderTest extends GroovyTestCase {
             //role 'server'
             name "爬"
             seeds list
-            thread 1
+            thread 2
             rounds 3
-            maxFetch 100
+            maxFetch 6
             include '.*audios/\\d.*'
 
             handle { Page page ->
