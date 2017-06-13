@@ -54,11 +54,14 @@ class Spider{
         log.info("Config : round $maxRoundCount ,maxFetch $maxFetchCount ,thread $maxThreadCount ,seeds ${getRoundLinkSet(1)} .")
 
         maxRoundCount.times {
+            def s = new Date()
             round = it+1
             Set<String> links = getRoundLinkSet(round).value
             log.info("Start round ${round} ,total ${links.size()} ...")
 
             scheduler.dealRoundLinks(crawlName,round,links)
+
+            log.info("Complete round ${round} ,total time ${(new Date().time - s.time)/1000}s .")
         }
 
         scheduler.shutdown()
