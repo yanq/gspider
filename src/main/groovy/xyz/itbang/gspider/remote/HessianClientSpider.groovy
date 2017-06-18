@@ -3,6 +3,7 @@ package xyz.itbang.gspider.remote
 import com.caucho.hessian.client.HessianProxyFactory
 import groovy.util.logging.Slf4j
 import xyz.itbang.gspider.Page
+import xyz.itbang.gspider.Spider
 import xyz.itbang.gspider.handler.Handler
 
 /**
@@ -10,30 +11,28 @@ import xyz.itbang.gspider.handler.Handler
  */
 @Slf4j
 class HessianClientSpider {
+    Spider spider
     HessianProxyFactory factory = new HessianProxyFactory();
-    String url = "http://localhost:8080/service"
-    List<Handler> handlerList
     Service service
 
-    HessianClientSpider(String url,List<Handler> handlerList){
-        this.url = url
-        this.handlerList = handlerList
+    HessianClientSpider(Spider spider){
+        this.spider = spider
     }
 
     void process(){
-        service = (Service) factory.create(Service, url);
+        service = (Service) factory.create(Service, spider.serviceURL);
 
         Page page = service.getTask(null)
 
         if (page){
-            log.info("Get page $page")
+            log.info("Get task : $page")
 
-            handlerList.each {
+            spider.handlerList.each {
                 if (it.matches(page.url)) it.handle(page)
             }
 
             def result = service.postTask(page)
-            log.info("Post task ${page} , $result")
+            log.info("Post task : ${page} , $result")
         }else {
             throw new Exception("No page found.")
         }

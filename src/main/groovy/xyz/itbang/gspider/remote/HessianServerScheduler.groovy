@@ -47,7 +47,7 @@ class HessianServerScheduler implements Scheduler {
             break
         }
 
-        log.info("Deal round : ${round} , links : ${links.size()}")
+        log.info("Round ${round} done, links : ${links.size()}")
     }
 
     @Override
@@ -60,7 +60,7 @@ class HessianServerScheduler implements Scheduler {
         server = new Server(uri.port);
         ServletContextHandler context = new ServletContextHandler(ServletContextHandler.SESSIONS);
         server.setHandler(context);
-        context.addServlet(HessianService.class, "/service")
+        context.addServlet(HessianService.class, uri.path)
         server.start()
     }
 

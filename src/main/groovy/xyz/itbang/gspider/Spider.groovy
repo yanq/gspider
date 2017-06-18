@@ -76,7 +76,7 @@ class Spider{
     void startClient(){
         log.info("Starting client spider,${maxThreadCount} thread ")
 
-        HessianClientSpider clientSpider = new HessianClientSpider(serviceURL,handlerList)
+        HessianClientSpider clientSpider = new HessianClientSpider(this)
         int idleCount = 0
         int maxIdleCount = 10
         int idleSleepTime = 3000
