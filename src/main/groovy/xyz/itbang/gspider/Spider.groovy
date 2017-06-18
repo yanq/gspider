@@ -42,15 +42,6 @@ class Spider{
         Date start = new Date()
         crawlName = crawlName+"@${start.time}"
         log.info("Starting $role spider, $crawlName ...")
-
-        //初始化调度器
-        if (role == 'alone'){
-            service = Executors.newFixedThreadPool(maxThreadCount)
-            scheduler = new LocalScheduler(this)
-        }else if (role == 'server'){
-            scheduler = new HessianServerScheduler(this)
-        }
-
         log.info("Config : round $maxRoundCount ,maxFetch $maxFetchCount ,thread $maxThreadCount ,seeds ${getRoundLinkSet(1)} .")
 
         maxRoundCount.times {
@@ -173,7 +164,14 @@ class Spider{
         if (spider.role in roles){
             if (spider.role == 'client'){
                 spider.startClient()
-            }else {
+            }else {//初始化调度器
+                if (!spider.scheduler){
+                    if (spider.role == 'alone'){
+                        spider.scheduler = new LocalScheduler(spider)
+                    }else if (spider.role == 'server'){
+                        spider.scheduler = new HessianServerScheduler(spider)
+                    }
+                }
                 spider.start()
             }
         } else {

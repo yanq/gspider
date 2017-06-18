@@ -2,6 +2,7 @@ package xyz.itbang.gspider
 
 import xyz.itbang.gspider.handler.AbstractHandler
 import xyz.itbang.gspider.handler.Handler
+import xyz.itbang.gspider.scheduler.Scheduler
 
 import java.util.regex.Pattern
 
@@ -115,6 +116,15 @@ class SpiderConfig {
      */
     def thread(int t){
         spider.maxThreadCount = t
+    }
+
+    /**
+     * 配置调度器类
+     * @param schedulerClass
+     * @return
+     */
+    def scheduler(Class<Scheduler> schedulerClass){
+        spider.scheduler = schedulerClass.newInstance(spider)
     }
 
     /**

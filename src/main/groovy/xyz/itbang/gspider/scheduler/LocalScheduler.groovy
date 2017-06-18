@@ -3,9 +3,7 @@ package xyz.itbang.gspider.scheduler
 import groovy.util.logging.Slf4j
 import xyz.itbang.gspider.Page
 import xyz.itbang.gspider.Spider
-import xyz.itbang.gspider.handler.Handler
 import java.util.concurrent.Callable
-import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
 import java.util.concurrent.Future
 
@@ -19,6 +17,7 @@ class LocalScheduler implements Scheduler {
 
     LocalScheduler(Spider spider) {
         this.spider = spider
+        this.spider.service = Executors.newFixedThreadPool(this.spider.maxThreadCount)
     }
 
     @Override
