@@ -33,7 +33,7 @@ class Spider{
     Closure reviewCrawl
     //分布式配置
     String role = 'alone' // alone 独立，server 服务端，client 客户端
-    String serviceURL = "http://localhost:8080/service"
+    String serviceURL = "http://localhost:8088/service"
     //内部数据
     int round = 1 //当前轮
 
