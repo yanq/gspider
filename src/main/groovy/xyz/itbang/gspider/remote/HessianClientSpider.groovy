@@ -31,8 +31,8 @@ class HessianClientSpider {
             handlerList.each {
                 if (it.matches(page.url)) it.handle(page)
             }
-            def result = service.postTask(page)
 
+            def result = service.postTask(page)
             log.info("Post task ${page} , $result")
         }else {
             throw new Exception("No page found.")

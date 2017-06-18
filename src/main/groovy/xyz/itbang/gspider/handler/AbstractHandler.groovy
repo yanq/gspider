@@ -40,8 +40,6 @@ abstract class AbstractHandler implements Handler {
         }
 
         handlePage(page)
-        page.endAt = new Date()
-
         return page
     }
 

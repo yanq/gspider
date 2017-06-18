@@ -58,6 +58,7 @@ class LocalScheduler implements Scheduler {
                     spider.handlerList.each {
                         if (it.matches(page.url)) it.handle(page)
                     }
+                    page.endAt = new Date()
 
                     spider.reviewPage?.call(page)
                     spider.parserLinks(page)
@@ -67,7 +68,7 @@ class LocalScheduler implements Scheduler {
                     e.printStackTrace()
                     page.markAsFailed()
                 } finally {
-                    page.endAt = new Date()
+                    page.endAt = page.endAt ?: new Date()
                     log.debug("Process url ${page.url} , use time ${page.endAt.time - page.startAt.time} ms")
                 }
 
