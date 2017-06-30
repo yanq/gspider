@@ -1,10 +1,9 @@
-package xyz.itbang.gspider.remote
+package xyz.itbang.gspider.distribute
 
 import com.caucho.hessian.client.HessianProxyFactory
 import groovy.util.logging.Slf4j
 import xyz.itbang.gspider.Page
 import xyz.itbang.gspider.Spider
-import xyz.itbang.gspider.handler.Handler
 
 /**
  * Created by yan on 2017/5/31.

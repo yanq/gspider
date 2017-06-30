@@ -26,7 +26,7 @@ class SpiderTest extends GroovyTestCase {
             handle { Page page ->
                 println("Handle -> " + page.url)
                 println("Title -> " + page.document.title())
-                page.markNoMoreLinks()
+                //page.markNoMoreLinks()
             }
 
             handle('.*audio.*') { Page page ->

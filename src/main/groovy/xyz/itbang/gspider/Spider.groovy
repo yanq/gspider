@@ -2,12 +2,11 @@ package xyz.itbang.gspider
 
 import groovy.util.logging.Slf4j
 import xyz.itbang.gspider.handler.Handler
-import xyz.itbang.gspider.remote.HessianClientSpider
-import xyz.itbang.gspider.remote.HessianServerScheduler
+import xyz.itbang.gspider.distribute.HessianClientSpider
+import xyz.itbang.gspider.distribute.HessianServerScheduler
 import xyz.itbang.gspider.scheduler.LocalScheduler
 import xyz.itbang.gspider.scheduler.Scheduler
 import java.util.concurrent.ExecutorService
-import java.util.concurrent.Executors
 import java.util.regex.Pattern
 
 /**

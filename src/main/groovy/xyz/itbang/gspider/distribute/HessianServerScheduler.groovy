@@ -1,4 +1,4 @@
-package xyz.itbang.gspider.remote
+package xyz.itbang.gspider.distribute
 
 import com.caucho.hessian.server.HessianServlet
 import groovy.util.logging.Slf4j

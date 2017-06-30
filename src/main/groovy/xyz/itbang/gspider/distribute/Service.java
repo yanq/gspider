@@ -1,4 +1,4 @@
-package xyz.itbang.gspider.remote;
+package xyz.itbang.gspider.distribute;
 
 import xyz.itbang.gspider.Page;
 
