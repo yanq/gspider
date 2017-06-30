@@ -3,9 +3,10 @@ package xyz.itbang.gspider.scheduler
 import groovy.util.logging.Slf4j
 import xyz.itbang.gspider.Page
 import xyz.itbang.gspider.Spider
+import xyz.itbang.gspider.util.TimedFuture
+
 import java.util.concurrent.Callable
 import java.util.concurrent.Executors
-import java.util.concurrent.Future
 
 /**
  * 本地调度器
@@ -22,23 +23,32 @@ class LocalScheduler implements Scheduler {
 
     @Override
     void dealRoundLinks(String crawlName, int round, Set<String> links) {
-        LinkedList<String> list = new LinkedList<>(links)
-        List<Future<Integer>> results = new ArrayList<>()
+        LinkedList<String> todoList = new LinkedList<>(links)
+        List<TimedFuture> doingList = new ArrayList<>()
 
         while (true) {
-            results.removeAll { it.done }
-            if (list.size() == 0 && results.size() == 0) break
+            //更新状态
+            doingList.removeAll {
+                if (it.done()) return true
+                if (it.overTime()){
+                    log.warn("Time out : $it.name")
+                    return true
+                }
+            }
 
-            if (results.size() > spider.maxThreadCount * 10) {
-                log.info("Prosessing url size：${results.size()} ，waiting 1s  ... ")
+            if (todoList.size() == 0 && doingList.size() == 0) break
+
+            if (doingList.size() > spider.maxThreadCount * 10) {
+                log.info("Prosessing url size：${doingList.size()} ，waiting 1s  ... ")
                 sleep(1000)
                 continue
             }
 
 
-            def url = list.poll()
+            def url = todoList.poll()
             if (url) {
-                results << spider.service.submit(buildCallable(url.toString()))
+                def future = spider.service.submit(buildCallable(url.toString()))
+                doingList << new TimedFuture(url.toString(), future, spider.maxWaitingTime)
                 continue
             }
 

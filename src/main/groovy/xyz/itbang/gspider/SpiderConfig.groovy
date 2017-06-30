@@ -119,6 +119,15 @@ class SpiderConfig {
     }
 
     /**
+     * 最长等待时间，下载和处理阶段
+     * @param time
+     * @return
+     */
+    def maxWaiting(int time){
+        spider.maxWaitingTime = time
+    }
+
+    /**
      * 配置调度器类
      * @param schedulerClass
      * @return

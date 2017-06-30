@@ -21,6 +21,7 @@ class Spider{
     int maxRoundCount = 3
     int maxFetchCount = 100
     int maxThreadCount  = 3
+    int maxWaitingTime = 60 * 1000 //默认60s
     ExecutorService service
     boolean includeOutSite = false
     Map<Integer, HashSet<String>> roundLinks = new HashMap<Integer, HashSet<String>>()

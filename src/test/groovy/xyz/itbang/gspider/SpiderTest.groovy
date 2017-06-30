@@ -21,6 +21,7 @@ class SpiderTest extends GroovyTestCase {
             thread 1
             rounds 3
             maxFetch 3
+            //maxWaiting 100
             include '.*audios/\\d.*'
 
             handle { Page page ->
