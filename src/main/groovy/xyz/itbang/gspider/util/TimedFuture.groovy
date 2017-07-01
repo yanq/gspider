@@ -25,4 +25,12 @@ class TimedFuture {
     boolean overTime() {
         (new Date().time - createAt.time) >= maxTime
     }
+
+    boolean cancel(boolean mayInterruptIfRunning){
+        future.cancel(mayInterruptIfRunning)
+    }
+
+    int time(){
+        new Date().time - createAt.time
+    }
 }

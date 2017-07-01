@@ -31,16 +31,18 @@ class LocalScheduler implements Scheduler {
             doingList.removeAll {
                 if (it.done()) return true
                 if (it.overTime()){
-                    log.warn("Time out : $it.name")
+                    def c = it.cancel(true) //当浏览器一直加载时，是取消不了的
+                    log.warn("Time out (${it.time()/1000}s) ,cancel $c : $it.name")
                     return true
                 }
             }
 
             if (todoList.size() == 0 && doingList.size() == 0) break
 
-            if (doingList.size() > spider.maxThreadCount * 10) {
-                log.info("Prosessing url size：${doingList.size()} ，waiting 1s  ... ")
-                sleep(1000)
+            //避免堆积过多造成过多超时
+            if (doingList.size() >= spider.maxThreadCount) {
+                log.debug("Prosessing url size：${doingList.size()} ，waiting 10ms  ... ")
+                sleep(10)
                 continue
             }
 
@@ -53,7 +55,7 @@ class LocalScheduler implements Scheduler {
             }
 
             //如果没有待处理的 url 了，等一会儿。
-            sleep(100)
+            sleep(10)
         }
     }
 
