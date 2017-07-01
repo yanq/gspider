@@ -3,10 +3,9 @@ package xyz.itbang.gspider.scheduler
 import groovy.util.logging.Slf4j
 import xyz.itbang.gspider.Page
 import xyz.itbang.gspider.Spider
-import xyz.itbang.gspider.util.TimedFuture
-
 import java.util.concurrent.Callable
 import java.util.concurrent.Executors
+import java.util.concurrent.Future
 
 /**
  * 本地调度器
@@ -24,10 +23,9 @@ class LocalScheduler implements Scheduler {
     @Override
     void dealRoundLinks(String crawlName, int round, Set<String> links) {
         LinkedList<String> todoList = new LinkedList<>(links)
-        List<TimedFuture> doingList = new ArrayList<>()
+        List<Future> doingList = new ArrayList<>()
 
         while (true) {
-            //更新状态
             doingList.removeAll {it.done()}
 
             if (todoList.size() == 0 && doingList.size() == 0) break
@@ -41,8 +39,7 @@ class LocalScheduler implements Scheduler {
 
             def url = todoList.poll()
             if (url) {
-                def future = spider.service.submit(buildCallable(url.toString()))
-                doingList << new TimedFuture(url.toString(), future, spider.maxWaitingTime)
+                doingList << spider.service.submit(buildCallable(url.toString()))
                 continue
             }
 
