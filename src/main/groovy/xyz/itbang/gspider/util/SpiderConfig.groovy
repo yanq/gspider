@@ -130,6 +130,15 @@ class SpiderConfig {
     }
 
     /**
+     * 客户端最长等待时间，用户分布式部署的客户端
+     * @param time
+     * @return
+     */
+    def maxClientWaiting(int time){
+        spider.maxClientWaitingTime = time
+    }
+
+    /**
      * 配置调度器类
      * @param schedulerClass
      * @return

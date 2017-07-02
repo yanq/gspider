@@ -4,6 +4,9 @@ import groovy.util.logging.Slf4j
 import xyz.itbang.gspider.handler.Handler
 import xyz.itbang.gspider.scheduler.LocalScheduler
 import xyz.itbang.gspider.scheduler.Scheduler
+import xyz.itbang.gspider.scheduler.distribute.DistributeScheduler
+import xyz.itbang.gspider.scheduler.distribute.HessianClient
+import xyz.itbang.gspider.scheduler.distribute.HessianServer
 import xyz.itbang.gspider.util.SpiderConfig
 import java.util.regex.Pattern
 
@@ -35,6 +38,7 @@ class Spider{
     Scheduler scheduler
     String role = 'alone' // alone 独立，server 服务端，client 客户端
     String serviceURL = "http://localhost:8088/service"
+    int maxClientWaitingTime = 60*60*1000 //默认一小时
 
     //内部数据
     int round = 1 //当前轮
@@ -74,23 +78,20 @@ class Spider{
         code.resolveStrategy = Closure.DELEGATE_ONLY
         code()
 
-        new LocalScheduler().ship(spider)
-
-//        if (spider.role in roles){
-//            if (spider.role == 'client'){
-//                spider.startClient()
-//            }else {//初始化调度器
-//                if (!spider.scheduler){
-//                    if (spider.role == 'alone'){
-//                        spider.scheduler = new LocalScheduler(spider)
-//                    }else if (spider.role == 'server'){
-//                        spider.scheduler = new HessianServerScheduler(spider)
-//                    }
-//                }
-//                spider.start()
-//            }
-//        } else {
-//            throw new Exception("Role ${spider.role} not in roles ${roles}")
-//        }
+        //根据角色，启动相应的程序
+        switch (spider.role){
+            case 'alone':
+                new LocalScheduler().ship(spider)
+                break
+            case 'server':
+                new HessianServer(spider.serviceURL).start()
+                new DistributeScheduler().ship(spider)
+                break
+            case 'client':
+                new HessianClient().start(spider)
+                break
+            default:
+                new Exception("Role ${spider.role} not in roles ${roles}")
+        }
     }
 }

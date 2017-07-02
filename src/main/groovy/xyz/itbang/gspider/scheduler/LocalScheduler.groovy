@@ -130,12 +130,12 @@ class LocalScheduler implements Scheduler {
         }
     }
 
-    private Set<String> getRoundLinkSet(int i) {
+    protected Set<String> getRoundLinkSet(int i) {
         if (!roundLinks[i]) roundLinks.put(i, Collections.synchronizedSet(new HashSet()))
         return roundLinks[i]
     }
 
-    int roundLinksTotal(){
+    protected int roundLinksTotal(){
         return roundLinks.values()*.size().sum()
     }
 }
