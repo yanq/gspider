@@ -2,7 +2,6 @@ package xyz.itbang.gspider
 
 import groovy.util.logging.Slf4j
 import xyz.itbang.gspider.handler.Handler
-import xyz.itbang.gspider.distribute.HessianServerScheduler
 import xyz.itbang.gspider.scheduler.LocalScheduler
 import xyz.itbang.gspider.scheduler.Scheduler
 import xyz.itbang.gspider.util.SpiderConfig
@@ -17,7 +16,7 @@ class Spider{
 
     static List<String> roles = ['alone','server','client']
 
-    String crawlName = "GSpider"
+    String name = "GSpider"
     List<String> seeds = []
     int maxRoundCount = 3
     int maxFetchCount = 100
@@ -40,7 +39,12 @@ class Spider{
     //内部数据
     int round = 1 //当前轮
     List<String> _hosts = []
+    Date createAt = new Date(),startAt,endAt
 
+    //标识某一次抓取名称
+    String getCrawlName(){
+        "${name}@${createAt.time}"
+    }
 
     //缓存的站点列表
     List<String> getHosts(){
@@ -70,21 +74,23 @@ class Spider{
         code.resolveStrategy = Closure.DELEGATE_ONLY
         code()
 
-        if (spider.role in roles){
-            if (spider.role == 'client'){
-                spider.startClient()
-            }else {//初始化调度器
-                if (!spider.scheduler){
-                    if (spider.role == 'alone'){
-                        spider.scheduler = new LocalScheduler(spider)
-                    }else if (spider.role == 'server'){
-                        spider.scheduler = new HessianServerScheduler(spider)
-                    }
-                }
-                spider.start()
-            }
-        } else {
-            throw new Exception("Role ${spider.role} not in roles ${roles}")
-        }
+        new LocalScheduler().ship(spider)
+
+//        if (spider.role in roles){
+//            if (spider.role == 'client'){
+//                spider.startClient()
+//            }else {//初始化调度器
+//                if (!spider.scheduler){
+//                    if (spider.role == 'alone'){
+//                        spider.scheduler = new LocalScheduler(spider)
+//                    }else if (spider.role == 'server'){
+//                        spider.scheduler = new HessianServerScheduler(spider)
+//                    }
+//                }
+//                spider.start()
+//            }
+//        } else {
+//            throw new Exception("Role ${spider.role} not in roles ${roles}")
+//        }
     }
 }

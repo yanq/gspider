@@ -12,6 +12,22 @@ class SpiderTest extends GroovyTestCase {
     String localHi = "http://localhost:8080/hi"
 
     //官方示例
+    void testSimple() {
+        def list = [luofans]
+        Spider.crawl {
+            seeds list
+            thread 3
+            rounds 3
+            maxFetch 30
+
+            handle { Page page ->
+                println("Handle -> " + page.url)
+                println("Title -> " + page.document.title())
+            }
+        }
+    }
+
+    //
     void testSpider() {
         def list = [luofans]
         Spider.crawl {

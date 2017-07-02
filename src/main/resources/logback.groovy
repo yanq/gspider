@@ -12,3 +12,5 @@ appender("CONSOLE", ConsoleAppender) {
 
 root(INFO, ["CONSOLE"])
 //root(DEBUG, ["CONSOLE"])
+
+logger('xyz.itbang.gspider',DEBUG)

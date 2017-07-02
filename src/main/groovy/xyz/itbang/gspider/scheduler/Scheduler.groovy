@@ -12,6 +12,5 @@ import java.util.Set;
  * Created by yan on 2017/5/31.
  */
 public interface Scheduler {
-    void dealRoundLinks(String crawlName, int round, Set<String> links);
-    void shutdown();
+    void ship(Spider spider);
 }

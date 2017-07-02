@@ -127,6 +127,12 @@ class Page implements Serializable{
         downloadTime = downloadEndAt.time - downloadStartAt.time
     }
 
+    String reorganize(String url) {
+        if (url.startsWith('http://') || url.startsWith('https://')) return url
+        if (url.startsWith('//')) return "${uri.scheme}:$url"
+        return "${host}/${!url.startsWith('/') ? url : url.substring(1)}"
+    }
+
     String toString() {
         "${currentRound} : $url"
     }
