@@ -1,5 +1,7 @@
-package xyz.itbang.gspider
+package xyz.itbang.gspider.util
 
+import xyz.itbang.gspider.Page
+import xyz.itbang.gspider.Spider
 import xyz.itbang.gspider.handler.AbstractHandler
 import xyz.itbang.gspider.handler.Handler
 import xyz.itbang.gspider.scheduler.Scheduler
@@ -51,11 +53,11 @@ class SpiderConfig {
      * @return
      */
     def seeds(String ...urls){
-        spider.getRoundLinkSet(1).addAll(urls)
+        spider.seeds.addAll(urls)
     }
 
     def seeds(List urls){
-        spider.getRoundLinkSet(1).addAll(urls)
+        spider.seeds.addAll(urls)
     }
 
     /**

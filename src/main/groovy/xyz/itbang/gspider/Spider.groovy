@@ -2,11 +2,10 @@ package xyz.itbang.gspider
 
 import groovy.util.logging.Slf4j
 import xyz.itbang.gspider.handler.Handler
-import xyz.itbang.gspider.distribute.HessianClientSpider
 import xyz.itbang.gspider.distribute.HessianServerScheduler
 import xyz.itbang.gspider.scheduler.LocalScheduler
 import xyz.itbang.gspider.scheduler.Scheduler
-import java.util.concurrent.ExecutorService
+import xyz.itbang.gspider.util.SpiderConfig
 import java.util.regex.Pattern
 
 /**
@@ -15,144 +14,54 @@ import java.util.regex.Pattern
  */
 @Slf4j
 class Spider{
+
     static List<String> roles = ['alone','server','client']
 
     String crawlName = "GSpider"
+    List<String> seeds = []
     int maxRoundCount = 3
     int maxFetchCount = 100
     int maxThreadCount  = 3
     int maxWaitingTime = 60 * 1000 //默认60s
-    ExecutorService service
     boolean includeOutSite = false
-    Map<Integer, HashSet<String>> roundLinks = new HashMap<Integer, HashSet<String>>()
-    Scheduler scheduler
     List<Pattern> includeRegexList = new ArrayList<>()
     List<Pattern> excludeRegexList = new ArrayList<>()
+
+    //处理器，回顾等
     List<Handler> handlerList = new ArrayList<>()
     Closure reviewPage
     Closure reviewCrawl
-    //分布式配置
+
+    //调度器及分布式配置
+    Scheduler scheduler
     String role = 'alone' // alone 独立，server 服务端，client 客户端
     String serviceURL = "http://localhost:8088/service"
+
     //内部数据
     int round = 1 //当前轮
+    List<String> _hosts = []
 
-    //启动，独立或者服务端。
-    void start(){
-        Date start = new Date()
-        crawlName = crawlName+"@${start.time}"
-        log.info("Starting $role spider, $crawlName ...")
-        log.info("Config : round $maxRoundCount ,maxFetch $maxFetchCount ,thread $maxThreadCount ,seeds ${getRoundLinkSet(1)} .")
 
-        maxRoundCount.times {
-            def s = new Date()
-            round = it+1
-            Set<String> links = getRoundLinkSet(round).value
-            log.info("Start round ${round} ,total ${links.size()} ...")
-
-            scheduler.dealRoundLinks(crawlName,round,links)
-
-            log.info("Complete round ${round} ,total time ${(new Date().time - s.time)/1000}s .")
+    //缓存的站点列表
+    List<String> getHosts(){
+        if (_hosts) return _hosts
+        seeds.each {
+            _hosts << new URI(it).host.split('\\.')[-2,-1].join('.')
         }
-
-        scheduler.shutdown()
-        service?.shutdown() //有些调度器不需要多线程，并未初始化之。
-
-        Date end = new Date()
-        reviewCrawl?.call(this,start,end)
-
-        log.info("Crawl over,fetch totle ${roundLinksTotal()} , total time ${(end.time - start.time)/1000} s .")
+        return _hosts
     }
 
-    void startClient(){
-        log.info("Starting client spider,${maxThreadCount} thread ")
-
-        HessianClientSpider clientSpider = new HessianClientSpider(this)
-        int idleCount = 0
-        int maxIdleCount = 10
-        int idleSleepTime = 3000
-        maxThreadCount.times {
-            def t = new Thread(new Runnable() {
-                @Override
-                void run() {
-                    while (true){
-                        try {
-                            clientSpider.process()
-                            idleCount = 0
-                        }catch (Exception e){
-                            log.warn("Exception : ${e.getMessage()} ,sleep ${idleSleepTime} ...")
-                            sleep(idleSleepTime)
-                            idleCount = idleCount+1
-                        }
-
-                        //println("idle count $idleCount")
-                        if (idleCount >= maxIdleCount*maxThreadCount){
-                            log.info("Client spider idle too long ,about ${(idleSleepTime*idleCount)/maxThreadCount} ms,it will shutdown now .")
-                            break
-                        }
-                    }
-                }
-            })
-            t.start()
-        }
+    //验证链接是否合规
+    boolean validate(String link){
+        //这里根据规则过滤
+        if (["javascript:", "mailto:"].find { link.contains(it) }) return false
+        if (!includeOutSite && !hosts.find {link.contains(it)}) return false
+        if (excludeRegexList && excludeRegexList.find { it.matcher(link).matches() }) return false
+        if (includeRegexList && !includeRegexList.find { it.matcher(link).matches() }) return false
+        return true
     }
 
-    void parserLinks(Page page) {
-        if (page.noMoreLinks) return
-        if (page.currentRound >= maxRoundCount) return
-        if (roundLinksTotal() >= maxFetchCount) return
-
-        log.debug("Parse links from ${page.url}")
-        if (page.links) {
-            page.links.each {
-                it = reorganize(page, it)
-            }
-        } else {
-            page.document.select("a[href]")*.attr('href').each {
-                def href = it.toString()
-                //这里根据规则过滤
-                if (["javascript:", "mailto:","#"].find { href.contains(it) }) return
-                def link = reorganize(page, href)
-                if (!includeOutSite && !inSite(page,link)) return
-                if (excludeRegexList && excludeRegexList.find { it.matcher(link).matches() }) return
-                if (includeRegexList && !includeRegexList.find { it.matcher(link).matches() }) return
-
-                page.links.add(link)
-            }
-        }
-        log.debug("               And find ${page.links.size()} links , ${page.links}")
-
-        page.links.each {
-            String url = it.trim()
-            if (!roundLinks.values().find { it.contains(url) } && roundLinksTotal() < maxFetchCount) {
-                getRoundLinkSet(page.currentRound + 1).add(it)
-            } else {
-                log.debug("Because too mach or duplicate ,drop the link $it")
-            }
-        }
-    }
-
-    private Set<String> getRoundLinkSet(int i) {
-        if (!roundLinks[i]) roundLinks.put(i, Collections.synchronizedSet(new HashSet()))
-        return roundLinks[i]
-    }
-
-    int roundLinksTotal(){
-        return roundLinks.values()*.size().sum()
-    }
-
-    private String reorganize(Page page, String url) {
-        if (url.startsWith('http://') || url.startsWith('https://')) return url
-        if (url.startsWith('//')) return "${page.uri.scheme}:$url"
-        return "${page.host}/${!url.startsWith('/') ? url : url.substring(1)}"
-    }
-    //本站的子域名，要包含在内
-    private boolean inSite(Page page, String url){
-        def baseDomain = page.uri.host.split('\\.')[-2,-1].join('.')
-        return url.contains(baseDomain)
-    }
-
-
+    //常规入口
     static crawl(@DelegatesTo(SpiderConfig) Closure closure) {
         Spider spider = new Spider()
 
