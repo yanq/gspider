@@ -1,4 +1,4 @@
-package xyz.itbang.gspider.distribute;
+package xyz.itbang.gspider.scheduler.distribute;
 
 import xyz.itbang.gspider.Page;
 
