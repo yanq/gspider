@@ -20,7 +20,6 @@ class LocalScheduler implements Scheduler {
     @Override
     void ship(Spider spider) {
         //初始化
-        service = Executors.newFixedThreadPool(spider.maxThreadCount)
         getRoundLinkSet(1).addAll(spider.seeds)
 
         spider.startAt = new Date()
@@ -37,7 +36,7 @@ class LocalScheduler implements Scheduler {
             log.info("Complete round ${spider.round} ,total time ${(new Date().time - s.time)/1000}s .")
         }
 
-        service.shutdown()
+        service?.shutdown()
 
         spider.endAt = new Date()
         spider.reviewCrawl?.call(spider)
@@ -46,6 +45,7 @@ class LocalScheduler implements Scheduler {
     }
 
     void dealRoundLinks(Spider spider) {
+        service = service ?: Executors.newFixedThreadPool(spider.maxThreadCount)
         Set<String> links = getRoundLinkSet(spider.round).value
 
         LinkedList<String> todoList = new LinkedList<>(links)
