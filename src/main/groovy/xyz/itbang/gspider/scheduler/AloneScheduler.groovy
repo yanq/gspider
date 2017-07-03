@@ -13,7 +13,7 @@ import java.util.concurrent.Future
  * Created by yan on 2017/5/31.
  */
 @Slf4j
-class LocalScheduler implements Scheduler {
+class AloneScheduler implements Scheduler {
     ExecutorService service
     Map<Integer, HashSet<String>> roundLinks = new HashMap<Integer, HashSet<String>>()
 

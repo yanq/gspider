@@ -3,14 +3,15 @@ package xyz.itbang.gspider.scheduler.distribute
 import groovy.util.logging.Slf4j
 import xyz.itbang.gspider.Page
 import xyz.itbang.gspider.Spider
-import xyz.itbang.gspider.scheduler.LocalScheduler
+import xyz.itbang.gspider.scheduler.AloneScheduler
 
 /**
- * 基于 Hessian 的调度器，server 端。
+ * 服务端调度器
+ * 部署于服务端的调度器，主要职责是把每一轮的抓取通过 DataCenter 委托给 HessianServer 来处理。
  * Created by yan on 2017/5/31.
  */
 @Slf4j
-class DistributeScheduler extends LocalScheduler {
+class OnServerScheduler extends AloneScheduler {
 
     @Override
     void dealRoundLinks(Spider spider) {

@@ -2,9 +2,9 @@ package xyz.itbang.gspider
 
 import groovy.util.logging.Slf4j
 import xyz.itbang.gspider.handler.Handler
-import xyz.itbang.gspider.scheduler.LocalScheduler
+import xyz.itbang.gspider.scheduler.AloneScheduler
 import xyz.itbang.gspider.scheduler.Scheduler
-import xyz.itbang.gspider.scheduler.distribute.DistributeScheduler
+import xyz.itbang.gspider.scheduler.distribute.OnServerScheduler
 import xyz.itbang.gspider.scheduler.distribute.HessianClient
 import xyz.itbang.gspider.scheduler.distribute.HessianServer
 import xyz.itbang.gspider.util.SpiderConfig
@@ -89,11 +89,11 @@ class Spider{
     void start(){
         switch (this.role){
             case 'alone':
-                new LocalScheduler().ship(this)
+                new AloneScheduler().ship(this)
                 break
             case 'server':
                 new HessianServer(this.serviceURL).start()
-                new DistributeScheduler().ship(this)
+                new OnServerScheduler().ship(this)
                 break
             case 'client':
                 new HessianClient().start(this)
