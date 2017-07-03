@@ -84,17 +84,15 @@ class LocalScheduler implements Scheduler {
                     spider.handlerList.each {
                         if (it.matches(page.url)) it.handle(page)
                     }
-                    page.endAt = new Date()
-
                     spider.reviewPage?.call(page)
                     parserLinks(spider,page)
                 } catch (Exception e) {
                     e.printStackTrace()
                     page.markAsFailed()
-                } finally {
-                    page.endAt = page.endAt ?: new Date()
-                    log.debug("Process url ${page.url} , use time ${page.endAt.time - page.startAt.time} ms")
                 }
+
+                page.endAt = new Date()
+                log.debug("Process url ${page.url} , download time ${page.downloadTime} ms , total time ${page.endAt.time - page.startAt.time} ms .")
 
                 return page
             }

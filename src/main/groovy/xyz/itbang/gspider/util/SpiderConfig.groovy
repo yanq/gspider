@@ -13,7 +13,7 @@ import java.util.regex.Pattern
  * Created by yan on 2017/2/15.
  */
 class SpiderConfig {
-    Spider spider
+    private Spider spider
 
     SpiderConfig(Spider s){
         this.spider =s
@@ -27,6 +27,7 @@ class SpiderConfig {
      */
     def role(String role){
         spider.role = role
+        return this
     }
     /**
      * 设置分布式的服务地址
@@ -36,6 +37,7 @@ class SpiderConfig {
      */
     def serviceUrl(String url){
         spider.serviceURL = url
+        return this
     }
 
     /**
@@ -45,6 +47,7 @@ class SpiderConfig {
      */
     def name(String name){
         spider.crawlName = name
+        return this
     }
 
     /**
@@ -54,10 +57,12 @@ class SpiderConfig {
      */
     def seeds(String ...urls){
         spider.seeds.addAll(urls)
+        return this
     }
 
     def seeds(List urls){
         spider.seeds.addAll(urls)
+        return this
     }
 
     /**
@@ -67,6 +72,7 @@ class SpiderConfig {
      */
     def includeOutSite(boolean b){
         spider.includeOutSite = b
+        return this
     }
 
     /**
@@ -78,6 +84,7 @@ class SpiderConfig {
         pattern.each {
             spider.excludeRegexList.add(Pattern.compile(it))
         }
+        return this
     }
 
     /**
@@ -89,6 +96,7 @@ class SpiderConfig {
         pattern.each {
             spider.includeRegexList.add(Pattern.compile(it))
         }
+        return this
     }
 
 
@@ -100,6 +108,7 @@ class SpiderConfig {
      */
     def rounds(int r){
         spider.maxRoundCount = r
+        return this
     }
 
     /**
@@ -109,6 +118,7 @@ class SpiderConfig {
      */
     def maxFetch(int m){
         spider.maxFetchCount = m
+        return this
     }
 
     /**
@@ -118,6 +128,7 @@ class SpiderConfig {
      */
     def thread(int t){
         spider.maxThreadCount = t
+        return this
     }
 
     /**
@@ -127,6 +138,7 @@ class SpiderConfig {
      */
     def maxWaiting(int time){
         spider.maxWaitingTime = time
+        return this
     }
 
     /**
@@ -136,6 +148,7 @@ class SpiderConfig {
      */
     def maxClientWaiting(int time){
         spider.maxClientWaitingTime = time
+        return this
     }
 
     /**
@@ -145,6 +158,7 @@ class SpiderConfig {
      */
     def scheduler(Class<Scheduler> schedulerClass){
         spider.scheduler = schedulerClass.newInstance(spider)
+        return this
     }
 
     /**
@@ -154,6 +168,7 @@ class SpiderConfig {
      */
     def handle(Closure closure){
         handle(".*",closure)
+        return this
     }
 
     /**
@@ -170,6 +185,7 @@ class SpiderConfig {
                 return page
             }
         })
+        return this
     }
 
     /**
@@ -181,6 +197,7 @@ class SpiderConfig {
         hs.each {
             spider.handlerList.add(it.newInstance())
         }
+        return this
     }
 
     /**
@@ -192,6 +209,7 @@ class SpiderConfig {
      */
     def review(Closure closure){
         spider.reviewPage = closure
+        return this
     }
 
     /**
@@ -201,5 +219,6 @@ class SpiderConfig {
      */
     def reviewCrawl(Closure closure){
         spider.reviewCrawl = closure
+        return this
     }
 }

@@ -59,6 +59,10 @@ class Spider{
         return _hosts
     }
 
+    SpiderConfig getConfig(){
+        return new SpiderConfig(this)
+    }
+
     //验证链接是否合规
     boolean validate(String link){
         //这里根据规则过滤

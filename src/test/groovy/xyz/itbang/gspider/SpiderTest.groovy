@@ -71,10 +71,9 @@ class SpiderTest extends GroovyTestCase {
 
     void testReorganize() {
         Page page = new Page(url: "http://luofans.com:8080")
-        Spider spider = new Spider()
-        println spider.reorganize(page, 'a')
-        println spider.reorganize(page, "http://a.com")
-        println spider.reorganize(page, "https://a.com")
+        println page.reorganize('a')
+        println page.reorganize("http://a.com")
+        println page.reorganize("https://a.com")
     }
 
     void testPageHTML() {
@@ -101,6 +100,18 @@ class SpiderTest extends GroovyTestCase {
 
     void testWaitFor() {
         //Tools.waitFor("Login,登录") //貌似测试运行时，无法从控制台读取数据，直接运行就可以。
+    }
+
+    void testConfig(){
+        Spider spider = new Spider()
+
+        spider.config
+                .seeds('http://luoyouzhijia.cn')
+                .thread(1)
+                .maxFetch(5)
+                .handle { Page page -> println("Title :${page.document.title()}") }
+
+        spider.start()
     }
 
     class DefaultHandler extends AbstractHandler{
