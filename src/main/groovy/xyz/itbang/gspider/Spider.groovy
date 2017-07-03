@@ -78,20 +78,24 @@ class Spider{
         code.resolveStrategy = Closure.DELEGATE_ONLY
         code()
 
-        //根据角色，启动相应的程序
-        switch (spider.role){
+        spider.start()
+    }
+
+    //启动爬虫，根据角色，启动相应的程序
+    void start(){
+        switch (this.role){
             case 'alone':
-                new LocalScheduler().ship(spider)
+                new LocalScheduler().ship(this)
                 break
             case 'server':
-                new HessianServer(spider.serviceURL).start()
-                new DistributeScheduler().ship(spider)
+                new HessianServer(this.serviceURL).start()
+                new DistributeScheduler().ship(this)
                 break
             case 'client':
-                new HessianClient().start(spider)
+                new HessianClient().start(this)
                 break
             default:
-                new Exception("Role ${spider.role} not in roles ${roles}")
+                new Exception("Role ${this.role} not in roles ${roles}")
         }
     }
 }
