@@ -1,15 +1,18 @@
 # GSpider
 
-a Groovy Spider,make crawl easy.
+a Java/Groovy Spider,make crawl easy.
 
-一个基于 Java/Groovy 语言的 Spider，让抓取更简单。
+一个基于 Java/Groovy 的 Spider，让抓取更简单。
 
 ## Feature 特性
-- easy to use,support crawl dsl. 简单易用，支持抓取DSL。
-- easy to manipulating html,by transform to jsoup document or json or just text. 响应结果可转换为 jsoup document，json 等，方便处理，也可以直接处理原文。
-- out of box of multithread,text clean,url filter and so on. 开箱即用的多线程，文本分析清洗，过滤URL等等。
+- easy to use,support crawl DSL. 易用，支持抓取DSL。
+- easy to manipulating html,by transform to jsoup document or json or just text. 操作网页简单，内置可用text, jsoup document,json 等格式。
+- config like nutch. 像使用 nutch 一样。配置种子，线程数，抓取数，页面范围（包含和排除），处理器等，就可启动了。
+- develop use java or groovy. 可用使用 Java 或者 Groovy 开发。当然也可用于任何JVM支持的语言。
+- deploy alone，distribute，and support multi-spider。 可独立部署，分布式部署，并支持多爬虫。
 
 ## Example 示例
+This is a Groovy script example. 这是一个 Groovy 脚本示例。
 ```
         Spider.crawl {
             seeds "http://www.luoyouzhijia.cn/"
@@ -29,11 +32,11 @@ a Groovy Spider,make crawl easy.
 ## How to use  咋用
 Gradle code
 ```
-compile 'xyz.itbang:gspider:1.3.0'
+compile 'xyz.itbang:gspider:3.0.0'
 ```
 
 ## Something to say 吹点牛
-If you can not read chinese，nothing important，just to have a cup of tea。someday，i'll say it again in English。
+If you can not read chinese，nothing important，just to have a cup of tea。someday，I'll say it again in English。
 
 因故需要爬取点东西，考察了 Java 领域的几个爬虫工具或框架。不甚满意。
 
