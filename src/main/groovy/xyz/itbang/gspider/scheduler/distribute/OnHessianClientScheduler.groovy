@@ -4,20 +4,22 @@ import com.caucho.hessian.client.HessianProxyFactory
 import groovy.util.logging.Slf4j
 import xyz.itbang.gspider.Page
 import xyz.itbang.gspider.Spider
+import xyz.itbang.gspider.scheduler.Scheduler
 
 /**
  * Created by yan on 2017/5/31.
  */
 @Slf4j
-class HessianClient {
+class OnHessianClientScheduler implements Scheduler{
     HessianProxyFactory factory = new HessianProxyFactory();
     Service service
 
-    void start(Spider spider) {
+    @Override
+    void ship(Spider spider) {
         log.info("Starting hessian client for ${spider.name},${spider.maxThreadCount} thread ")
 
         spider.maxThreadCount.times {
-            def t = new Thread(new Runnable() {
+            new Thread(new Runnable() {
                 @Override
                 void run() {
                     Date startWaiting
@@ -61,8 +63,7 @@ class HessianClient {
                         sleep(100)
                     }
                 }
-            })
-            t.start()
+            }).start()
         }
     }
 }

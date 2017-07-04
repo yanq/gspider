@@ -5,7 +5,7 @@ import xyz.itbang.gspider.handler.Handler
 import xyz.itbang.gspider.scheduler.AloneScheduler
 import xyz.itbang.gspider.scheduler.Scheduler
 import xyz.itbang.gspider.scheduler.distribute.OnServerScheduler
-import xyz.itbang.gspider.scheduler.distribute.HessianClient
+import xyz.itbang.gspider.scheduler.distribute.OnHessianClientScheduler
 import xyz.itbang.gspider.scheduler.distribute.HessianServer
 import xyz.itbang.gspider.util.SpiderConfig
 import java.util.regex.Pattern
@@ -86,7 +86,7 @@ class Spider{
     }
     void startAlone(){new AloneScheduler().ship(this)}
     void startOnServer(){new OnServerScheduler().ship(this)}
-    void startOnClient(){new HessianClient().start(this)}
+    void startOnClient(){new OnHessianClientScheduler().ship(this)}
     void startService(){new HessianServer(this.serviceURL).start()}
 
     //验证链接是否合规
