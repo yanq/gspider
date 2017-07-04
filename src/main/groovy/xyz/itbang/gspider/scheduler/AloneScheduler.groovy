@@ -92,7 +92,7 @@ class AloneScheduler implements Scheduler {
                 }
 
                 page.endAt = new Date()
-                log.debug("Process url ${page.url} , download time ${page.downloadTime} ms , total time ${page.endAt.time - page.startAt.time} ms .")
+                log.info("Process url ${page.url} , download time ${page.downloadTime} ms , total time ${page.endAt.time - page.startAt.time} ms .")
 
                 return page
             }

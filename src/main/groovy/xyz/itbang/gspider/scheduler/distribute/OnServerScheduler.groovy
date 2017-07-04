@@ -25,12 +25,13 @@ class OnServerScheduler extends AloneScheduler {
         while (true) {
             //收到 page 就处理
             if (doingList.size() > 0) {
+                log.trace("Doing list size : ${doingList.size()},${startWaiting ?'clear waiting status,':''}process it ...")
                 def page = doingList.poll()
                 spider.reviewPage?.call(page)
                 parserLinks(spider,page)
 
                 page.endAt = new Date()
-                log.debug("Process url ${page.url} , download time ${page.downloadTime} ms , total time ${page.endAt.time - page.startAt.time} ms .")
+                log.info("Process url ${page.url} , download time ${page.downloadTime} ms , total time ${page.endAt.time - page.startAt.time} ms .")
 
                 count--
                 continue
@@ -38,6 +39,7 @@ class OnServerScheduler extends AloneScheduler {
 
             //没有分发完，就等
             if (todoList.size() > 0){
+                log.trace("Todo list size : ${todoList.size()},just sleep(10) and continue")
                 sleep(10)
                 continue
             }
@@ -47,11 +49,15 @@ class OnServerScheduler extends AloneScheduler {
 
             //开始计时等
             if (startWaiting){
-                if ((new Date().time - startWaiting.time) > spider.maxWaitingTime) break
+                if ((new Date().time - startWaiting.time) > spider.maxWaitingTime){
+                    log.warn("Waiting time（${spider.maxWaitingTime}ms） is out，just break ~")
+                    break
+                }
             }else {
                 startWaiting = new Date()
+                log.trace("Start waiting to end this round")
             }
-            sleep(10)
+            sleep(100)
         }
     }
 

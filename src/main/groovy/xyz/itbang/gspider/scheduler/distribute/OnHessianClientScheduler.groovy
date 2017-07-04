@@ -31,7 +31,7 @@ class OnHessianClientScheduler implements Scheduler{
                             Page page = service.getTask(null)
 
                             if (page) {
-                                log.info("Get task : $page ${startWaiting ? ', stop waiting status.' :''}")
+                                log.info("Get task : $page , ${startWaiting ? 'clear waiting status,' :''}process it ...")
                                 startWaiting = null
 
                                 spider.handlerList.each {
@@ -42,12 +42,12 @@ class OnHessianClientScheduler implements Scheduler{
                                 log.info("Post task : ${page} , $result")
                             } else {
                                 startWaiting = startWaiting ?: new Date()
-                                log.info("Get no page todo,start waiting to exit ...")
+                                log.info("Get no page todo,sleep(${idleTime}ms),waiting to exit ...")
                                 sleep(idleTime)
                             }
                         } catch (Exception e) {
                             startWaiting = startWaiting ?: new Date()
-                            log.warn("Exception : ${e.getMessage()},start waiting to exit ...")
+                            log.warn("Exception : ${e.getMessage()},sleep(${idleTime}ms),waiting to exit ...")
                             e.printStackTrace()
                             sleep(idleTime)
                         }
