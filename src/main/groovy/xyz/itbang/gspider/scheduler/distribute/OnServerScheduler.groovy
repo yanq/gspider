@@ -26,10 +26,9 @@ class OnServerScheduler extends AloneScheduler {
             //收到 page 就处理
             if (doingList.size() > 0) {
                 log.trace("Doing list size : ${doingList.size()},${startWaiting ?'clear waiting status,':''}process it ...")
-                def page = doingList.poll()
-                spider.reviewPage?.call(page)
-                parserLinks(spider,page)
 
+                def page = doingList.poll()
+                parserLinks(spider,page)
                 page.endAt = new Date()
                 log.info("Process url ${page.url} , download time ${page.downloadTime} ms , total time ${page.endAt.time - page.startAt.time} ms .")
 

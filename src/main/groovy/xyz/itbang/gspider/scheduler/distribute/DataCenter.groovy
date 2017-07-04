@@ -22,6 +22,7 @@ class DataCenter {
     static void put(Page page) {
         def e = doing.find { it.key.crawlName == page.crawlName }
         if (e) {
+            e.key.reviewPage?.call(page) //把尽可能多的工作放到这里，避免主线程吃紧
             e.value.offer(page)
         }
     }
