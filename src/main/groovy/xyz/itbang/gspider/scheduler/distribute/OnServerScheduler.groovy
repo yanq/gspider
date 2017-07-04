@@ -26,7 +26,12 @@ class OnServerScheduler extends AloneScheduler {
             //收到 page 就处理
             if (doingList.size() > 0) {
                 def page = doingList.poll()
+                spider.reviewPage?.call(page)
                 parserLinks(spider,page)
+
+                page.endAt = new Date()
+                log.debug("Process url ${page.url} , download time ${page.downloadTime} ms , total time ${page.endAt.time - page.startAt.time} ms .")
+
                 count--
                 continue
             }
