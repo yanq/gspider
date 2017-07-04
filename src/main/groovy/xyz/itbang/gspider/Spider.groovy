@@ -50,27 +50,9 @@ class Spider{
         "${name}@${createAt.time}"
     }
 
-    //缓存的站点列表
-    List<String> getHosts(){
-        if (_hosts) return _hosts
-        seeds.each {
-            _hosts << new URI(it).host.split('\\.')[-2,-1].join('.')
-        }
-        return _hosts
-    }
-
+    //获取配置对象
     SpiderConfig getConfig(){
         return new SpiderConfig(this)
-    }
-
-    //验证链接是否合规
-    boolean validate(String link){
-        //这里根据规则过滤
-        if (["javascript:", "mailto:"].find { link.contains(it) }) return false
-        if (!includeOutSite && !hosts.find {link.contains(it)}) return false
-        if (excludeRegexList && excludeRegexList.find { it.matcher(link).matches() }) return false
-        if (includeRegexList && !includeRegexList.find { it.matcher(link).matches() }) return false
-        return true
     }
 
     //常规入口
@@ -101,5 +83,24 @@ class Spider{
             default:
                 new Exception("Role ${this.role} not in roles ${roles}")
         }
+    }
+
+    //验证链接是否合规
+    boolean validate(String link){
+        //这里根据规则过滤
+        if (["javascript:", "mailto:"].find { link.contains(it) }) return false
+        if (!includeOutSite && !hosts.find {link.contains(it)}) return false
+        if (excludeRegexList && excludeRegexList.find { it.matcher(link).matches() }) return false
+        if (includeRegexList && !includeRegexList.find { it.matcher(link).matches() }) return false
+        return true
+    }
+
+    //缓存的站点列表
+    List<String> getHosts(){
+        if (_hosts) return _hosts
+        seeds.each {
+            _hosts << new URI(it).host.split('\\.')[-2,-1].join('.')
+        }
+        return _hosts
     }
 }
