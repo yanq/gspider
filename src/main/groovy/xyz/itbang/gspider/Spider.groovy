@@ -71,19 +71,23 @@ class Spider{
     void start(){
         switch (this.role){
             case 'alone':
-                new AloneScheduler().ship(this)
+                startAlone()
                 break
             case 'server':
-                new HessianServer(this.serviceURL).start()
-                new OnServerScheduler().ship(this)
+                startService()
+                startOnServer()
                 break
             case 'client':
-                new HessianClient().start(this)
+                startOnClient()
                 break
             default:
                 new Exception("Role ${this.role} not in roles ${roles}")
         }
     }
+    void startAlone(){new AloneScheduler().ship(this)}
+    void startOnServer(){new OnServerScheduler().ship(this)}
+    void startOnClient(){new HessianClient().start(this)}
+    void startService(){new HessianServer(this.serviceURL).start()}
 
     //验证链接是否合规
     boolean validate(String link){
