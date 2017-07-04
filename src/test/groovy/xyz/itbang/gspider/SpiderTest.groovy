@@ -106,12 +106,20 @@ class SpiderTest extends GroovyTestCase {
         Spider spider = new Spider()
 
         spider.config
-                .seeds('http://luoyouzhijia.cn')
+                .seeds('http://127.0.0.1:8080/')
                 .thread(1)
                 .maxFetch(5)
                 .handle { Page page -> println("Title :${page.document.title()}") }
 
         spider.start()
+    }
+
+    void testHost(){
+        ['http://luoyouzhijia.cn/','http://localhost:8080/',"http://127.0.0.1:8080","http://192.168.0.100:8080"].each {
+            def host = new URI(it).host
+            println "Host : $host"
+            println((host=='localhost' || host.matches("(\\d+\\.){3}\\d+")) ? host : host.split('\\.')[-2,-1].join('.'))
+        }
     }
 
     class DefaultHandler extends AbstractHandler{

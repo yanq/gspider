@@ -103,7 +103,8 @@ class Spider{
     List<String> getHosts(){
         if (_hosts) return _hosts
         seeds.each {
-            _hosts << new URI(it).host.split('\\.')[-2,-1].join('.')
+            def host = new URI(it).host
+            _hosts << ((host=='localhost' || host.matches("(\\d+\\.){3}\\d+")) ? host : host.split('\\.')[-2,-1].join('.'))
         }
         return _hosts
     }
