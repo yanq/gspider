@@ -152,16 +152,6 @@ class SpiderConfig {
     }
 
     /**
-     * 配置调度器类
-     * @param schedulerClass
-     * @return
-     */
-    def scheduler(Class<Scheduler> schedulerClass){
-        spider.scheduler = schedulerClass.newInstance(spider)
-        return this
-    }
-
-    /**
      * 设置处理器，默认处理所有页面。
      * @param closure
      * @return
