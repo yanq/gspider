@@ -97,7 +97,7 @@ class Page implements Serializable{
     }
 
     void download(){
-        startDownload()
+        downloadStart()
         try {
             text = connection.execute().body()
         }catch (Exception e){
@@ -116,13 +116,12 @@ class Page implements Serializable{
                 }
             }
         }
-        overDownload()
+        downloadEnd()
     }
-
-    void startDownload(){
+    void downloadStart(){
         downloadStartAt = new Date()
     }
-    void overDownload(){
+    void downloadEnd(){
         downloadEndAt = new Date()
         downloadTime = downloadEndAt.time - downloadStartAt.time
     }
