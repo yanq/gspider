@@ -32,7 +32,7 @@ This is a Groovy script example. 这是一个 Groovy 脚本示例。
 ## How to use  咋用
 Gradle code
 ```
-compile 'xyz.itbang:gspider:3.0.0'
+compile 'xyz.itbang:gspider:3.1.1'
 ```
 
 ## Something to say 吹点牛
