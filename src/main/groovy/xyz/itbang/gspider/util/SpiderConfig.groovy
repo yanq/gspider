@@ -25,7 +25,7 @@ class SpiderConfig {
      * @param role
      * @return
      */
-    def role(String role){
+    SpiderConfig role(String role){
         spider.role = role
         return this
     }
@@ -35,7 +35,7 @@ class SpiderConfig {
      * @param url
      * @return
      */
-    def serviceUrl(String url){
+    SpiderConfig serviceUrl(String url){
         spider.serviceURL = url
         return this
     }
@@ -45,7 +45,7 @@ class SpiderConfig {
      * @param name
      * @return
      */
-    def name(String name){
+    SpiderConfig name(String name){
         spider.crawlName = name
         return this
     }
@@ -55,12 +55,12 @@ class SpiderConfig {
      * @param urls
      * @return
      */
-    def seeds(String ...urls){
+    SpiderConfig seeds(String ...urls){
         spider.seeds.addAll(urls)
         return this
     }
 
-    def seeds(List urls){
+    SpiderConfig seeds(List urls){
         spider.seeds.addAll(urls)
         return this
     }
@@ -70,7 +70,7 @@ class SpiderConfig {
      * @param b
      * @return
      */
-    def includeOutSite(boolean b){
+    SpiderConfig includeOutSite(boolean b){
         spider.includeOutSite = b
         return this
     }
@@ -80,7 +80,7 @@ class SpiderConfig {
      * @param pattern 格式为 Java 的正则表达式
      * @return
      */
-    def exclude(String... pattern){
+    SpiderConfig exclude(String... pattern){
         pattern.each {
             spider.excludeRegexList.add(Pattern.compile(it))
         }
@@ -92,7 +92,7 @@ class SpiderConfig {
      * @param pattern 格式为 Java 的正则表达式
      * @return
      */
-    def include(String... pattern){
+    SpiderConfig include(String... pattern){
         pattern.each {
             spider.includeRegexList.add(Pattern.compile(it))
         }
@@ -106,7 +106,7 @@ class SpiderConfig {
      * @param r
      * @return
      */
-    def rounds(int r){
+    SpiderConfig rounds(int r){
         spider.maxRoundCount = r
         return this
     }
@@ -116,7 +116,7 @@ class SpiderConfig {
      * @param m
      * @return
      */
-    def maxFetch(int m){
+    SpiderConfig maxFetch(int m){
         spider.maxFetchCount = m
         return this
     }
@@ -126,7 +126,7 @@ class SpiderConfig {
      * @param t
      * @return
      */
-    def thread(int t){
+    SpiderConfig thread(int t){
         spider.maxThreadCount = t
         return this
     }
@@ -136,7 +136,7 @@ class SpiderConfig {
      * @param time
      * @return
      */
-    def maxWaiting(int time){
+    SpiderConfig maxWaiting(int time){
         spider.maxWaitingTime = time
         return this
     }
@@ -146,7 +146,7 @@ class SpiderConfig {
      * @param time
      * @return
      */
-    def maxClientWaiting(int time){
+    SpiderConfig maxClientWaiting(int time){
         spider.maxClientWaitingTime = time
         return this
     }
@@ -156,7 +156,7 @@ class SpiderConfig {
      * @param closure
      * @return
      */
-    def handle(Closure closure){
+    SpiderConfig handle(Closure closure){
         handle(".*",closure)
         return this
     }
@@ -167,7 +167,7 @@ class SpiderConfig {
      * @param closure
      * @return
      */
-    def handle(String pattern,Closure closure){
+    SpiderConfig handle(String pattern,Closure closure){
         spider.handlerList.add(new AbstractHandler(pattern) {
             @Override
             Page handlePage(Page page) {
@@ -183,7 +183,7 @@ class SpiderConfig {
      * @param l
      * @return
      */
-    def handlers(Class<Handler> ...hs){
+    SpiderConfig handlers(Class<Handler> ...hs){
         hs.each {
             spider.handlerList.add(it.newInstance())
         }
@@ -197,7 +197,7 @@ class SpiderConfig {
      * @param closure
      * @return
      */
-    def review(Closure closure){
+    SpiderConfig review(Closure closure){
         spider.reviewPage = closure
         return this
     }
@@ -207,7 +207,7 @@ class SpiderConfig {
      * @param closure
      * @return
      */
-    def reviewCrawl(Closure closure){
+    SpiderConfig reviewCrawl(Closure closure){
         spider.reviewCrawl = closure
         return this
     }
